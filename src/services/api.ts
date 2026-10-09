@@ -26,6 +26,9 @@ api.interceptors.response.use(
         typeof window !== "undefined" &&
         window.location.pathname !== "/login"
       ) {
+        // Hors d'un composant React, il n'y a pas de routeur : on recharge
+        // la page, ce qui vide aussi tout ce qui était affiché.
+        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
         window.location.assign("/login?session=expiree");
       }
     }
