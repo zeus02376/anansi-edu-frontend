@@ -4,6 +4,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Cadre } from "../_components/cadre";
+import {
+  CLASSE_BOUTON_PRINCIPAL,
+  CLASSE_CHAMP,
+  CLASSE_ERREUR,
+  CLASSE_LIBELLE,
+  CLASSE_TITRE,
+} from "../_components/styles";
 
 const loginSchema = z.object({
   email: z
@@ -80,20 +88,20 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-12">
-      <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-semibold tracking-tight">Connexion</h1>
-        <p className="mt-2 text-sm text-foreground/70">
+    <Cadre texte="Retrouvez votre espace personnel ANANSI EDU.">
+      <div className="lg:flex lg:min-h-[calc(100vh-8rem)] lg:flex-col lg:justify-center">
+        <h1 className={CLASSE_TITRE}>Connexion</h1>
+        <p className="mt-3 text-base text-muted">
           Saisissez vos identifiants pour accéder à votre espace.
         </p>
 
         <form
           onSubmit={handleSubmit(onSubmit, () => setIsLoggedIn(false))}
           noValidate
-          className="mt-8 flex flex-col gap-5"
+          className="mt-8 flex max-w-sm flex-col gap-5"
         >
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-medium">
+            <label htmlFor="email" className={CLASSE_LIBELLE}>
               Adresse e-mail
             </label>
             <input
@@ -102,22 +110,18 @@ export default function LoginPage() {
               autoComplete="email"
               aria-invalid={errors.email ? true : undefined}
               aria-describedby={errors.email ? "email-error" : undefined}
-              className="rounded-md border border-foreground/20 bg-transparent px-3 py-2 text-sm outline-hidden focus-visible:border-foreground focus-visible:ring-2 focus-visible:ring-foreground/20 aria-invalid:border-red-600"
+              className={CLASSE_CHAMP}
               {...register("email")}
             />
             {errors.email && (
-              <p
-                id="email-error"
-                role="alert"
-                className="text-sm text-red-700 dark:text-red-400"
-              >
+              <p id="email-error" role="alert" className={CLASSE_ERREUR}>
                 {errors.email.message}
               </p>
             )}
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-medium">
+            <label htmlFor="password" className={CLASSE_LIBELLE}>
               Mot de passe
             </label>
             <input
@@ -126,15 +130,11 @@ export default function LoginPage() {
               autoComplete="current-password"
               aria-invalid={errors.password ? true : undefined}
               aria-describedby={errors.password ? "password-error" : undefined}
-              className="rounded-md border border-foreground/20 bg-transparent px-3 py-2 text-sm outline-hidden focus-visible:border-foreground focus-visible:ring-2 focus-visible:ring-foreground/20 aria-invalid:border-red-600"
+              className={CLASSE_CHAMP}
               {...register("password")}
             />
             {errors.password && (
-              <p
-                id="password-error"
-                role="alert"
-                className="text-sm text-red-700 dark:text-red-400"
-              >
+              <p id="password-error" role="alert" className={CLASSE_ERREUR}>
                 {errors.password.message}
               </p>
             )}
@@ -143,7 +143,7 @@ export default function LoginPage() {
           {errors.root?.server && (
             <p
               role="alert"
-              className="rounded-md border border-red-600/40 bg-red-600/10 px-3 py-2 text-sm text-red-800 dark:text-red-300"
+              className="rounded-md border border-red-600/40 bg-red-600/10 px-3.5 py-2.5 text-sm text-red-800 dark:text-red-300"
             >
               {errors.root.server.message}
             </p>
@@ -152,7 +152,7 @@ export default function LoginPage() {
           {isLoggedIn && (
             <p
               role="status"
-              className="rounded-md border border-green-700/40 bg-green-700/10 px-3 py-2 text-sm text-green-800 dark:text-green-300"
+              className="rounded-md border border-green-700/40 bg-green-700/10 px-3.5 py-2.5 text-sm font-medium text-green-800 dark:text-green-300"
             >
               Connexion réussie.
             </p>
@@ -161,12 +161,12 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            className={`${CLASSE_BOUTON_PRINCIPAL} mt-1 self-start`}
           >
             {isSubmitting ? "Connexion en cours…" : "Se connecter"}
           </button>
         </form>
       </div>
-    </main>
+    </Cadre>
   );
 }
