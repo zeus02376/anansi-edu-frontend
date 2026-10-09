@@ -45,12 +45,16 @@ export function useCandidatures() {
     liste.current = donnees;
   }, [donnees]);
 
-  function changerStatut(id: string, statut: StatutCandidature) {
-    if (enCours[id]) return;
+  // Renvoie true si le serveur a enregistré le nouveau statut.
+  function changerStatut(
+    id: string,
+    statut: StatutCandidature,
+  ): Promise<boolean> {
+    if (enCours[id]) return Promise.resolve(false);
     setEnCours((precedent) => ({ ...precedent, [id]: statut }));
     setErreurs((precedentes) => sans(precedentes, id));
 
-    api
+    return api
       .patch<Candidature>(`/candidatures/${encodeURIComponent(id)}/statut`, {
         statut,
       })
@@ -64,14 +68,16 @@ export function useCandidatures() {
           liste.current = suivante;
           remplacer(suivante);
         }
+        return true;
       })
       .catch((echec: unknown) => {
         setErreurs((precedentes) => ({
           ...precedentes,
           [id]: messageErreurApi(echec),
         }));
+        return false;
       })
-      .then(() => setEnCours((precedent) => sans(precedent, id)));
+      .finally(() => setEnCours((precedent) => sans(precedent, id)));
   }
 
   return {

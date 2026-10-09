@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   compterParStatut,
   nomCandidat,
@@ -33,13 +33,42 @@ import {
 
 type Filtre = StatutCandidature | "TOUS";
 
+// Le backend ne donne pas de niveau pour une candidature : on affiche le
+// cycle de la filière visée (licence, master…).
+const LIBELLE_CYCLE: Record<string, string> = {
+  BTS: "BTS",
+  HND: "HND",
+  LICENCE: "Licence",
+  MASTER: "Master",
+  INGENIEUR: "Ingénieur",
+};
+
+function cycleDeLaFiliere(candidature: Candidature): string | null {
+  const cycle = candidature.filiere?.cycle;
+  return cycle ? (LIBELLE_CYCLE[cycle] ?? cycle) : null;
+}
+
+// Tableau à partir de 768 px, cartes en dessous. Un seul des deux est
+// affiché à la fois : les champs de statut ne sont jamais en double.
+function useEcranLarge(): boolean {
+  return useSyncExternalStore(
+    (notifier) => {
+      const requete = window.matchMedia("(min-width: 48rem)");
+      requete.addEventListener("change", notifier);
+      return () => requete.removeEventListener("change", notifier);
+    },
+    () => window.matchMedia("(min-width: 48rem)").matches,
+    () => true,
+  );
+}
+
 const CLASSE_FILTRE =
   "rounded-full border border-field px-3.5 py-1.5 text-sm font-semibold text-ink transition-colors duration-150 hover:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:text-on-primary";
 
 const COLONNES = [
   "Numéro de dossier",
   "Candidat",
-  "Filière",
+  "Filière et cycle",
   "Date de dépôt",
   "Statut",
   "Changer le statut",
@@ -57,7 +86,7 @@ function ChangementDeStatut({
   // Statut en cours d'enregistrement, s'il y en a un.
   cible?: StatutCandidature;
   echec?: string;
-  onEnregistrer: (statut: StatutCandidature) => void;
+  onEnregistrer: (statut: StatutCandidature) => Promise<boolean>;
 }) {
   const [choix, setChoix] = useState(candidature.statut);
   const nom = nomCandidat(candidature);
@@ -92,7 +121,12 @@ function ChangementDeStatut({
           type="button"
           disabled={enCours || choix === candidature.statut}
           className={`${CLASSE_BOUTON_PRINCIPAL} px-3 py-1.5`}
-          onClick={() => onEnregistrer(choix)}
+          onClick={() =>
+            // Si l'enregistrement échoue, la liste revient à l'ancien statut.
+            void onEnregistrer(choix).then((enregistre) => {
+              if (!enregistre) setChoix(candidature.statut);
+            })
+          }
         >
           {enCours ? "Envoi…" : "Enregistrer"}
           <span className="sr-only"> le statut de la candidature de {nom}</span>
@@ -122,6 +156,7 @@ export default function ScolariteCandidaturesPage() {
     changerStatut,
   } = useCandidatures();
   const [filtre, setFiltre] = useState<Filtre>("TOUS");
+  const ecranLarge = useEcranLarge();
 
   const compteurs = candidatures && compterParStatut(candidatures);
   const visibles =
@@ -191,6 +226,7 @@ export default function ScolariteCandidaturesPage() {
                 : "Aucune candidature avec ce statut."}
             </Vide>
           ) : (
+            ecranLarge ? (
             <div className={CLASSE_TABLEAU_DEFILANT}>
               <table className={CLASSE_TABLEAU}>
                 <caption className="sr-only">Liste des candidatures</caption>
@@ -223,11 +259,14 @@ export default function ScolariteCandidaturesPage() {
                           <span className="block">
                             {candidature.filiere?.nom ?? "—"}
                           </span>
-                          {candidature.anneeAcademique && (
-                            <span className="block whitespace-nowrap text-muted">
-                              {candidature.anneeAcademique.libelle}
-                            </span>
-                          )}
+                          <span className="block whitespace-nowrap text-muted">
+                            {[
+                              cycleDeLaFiliere(candidature),
+                              candidature.anneeAcademique?.libelle,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </span>
                         </td>
                         <td className={`${CLASSE_TD} whitespace-nowrap`}>
                           {formaterDate(candidature.createdAt)}
@@ -251,6 +290,60 @@ export default function ScolariteCandidaturesPage() {
                 </tbody>
               </table>
             </div>
+            ) : (
+            <ul className="divide-y divide-line">
+              {visibles.map((candidature) => (
+                <li key={candidature.id} className="flex flex-col gap-3 px-4 py-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-ink">
+                        {nomCandidat(candidature)}
+                      </p>
+                      <p className="truncate text-sm text-muted">
+                        {candidature.email}
+                      </p>
+                    </div>
+                    <BadgeCandidature statut={candidature.statut} />
+                  </div>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <div>
+                      <dt className="text-muted">Dossier</dt>
+                      <dd className="font-medium text-ink">
+                        {candidature.numeroDossier}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-muted">Date de dépôt</dt>
+                      <dd className="font-medium text-ink">
+                        {formaterDate(candidature.createdAt)}
+                      </dd>
+                    </div>
+                    <div className="col-span-2">
+                      <dt className="text-muted">Filière et cycle</dt>
+                      <dd className="font-medium text-ink">
+                        {candidature.filiere?.nom ?? "—"}
+                        {" · "}
+                        {[
+                          cycleDeLaFiliere(candidature),
+                          candidature.anneeAcademique?.libelle,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                      </dd>
+                    </div>
+                  </dl>
+                  <ChangementDeStatut
+                    candidature={candidature}
+                    cible={enCours[candidature.id]}
+                    echec={erreurs[candidature.id]}
+                    onEnregistrer={(statut) =>
+                      changerStatut(candidature.id, statut)
+                    }
+                  />
+                </li>
+              ))}
+            </ul>
+            )
           )}
         </Carte>
       )}
