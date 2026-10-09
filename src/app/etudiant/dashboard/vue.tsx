@@ -1,199 +1,275 @@
 "use client";
 
-import type { ReactNode } from "react";
+import Link from "next/link";
+import { EchecDeChargement } from "@/components/AccesLimite";
 import {
-  BadgeInscription,
+  CLASSE_TITRE_CARTE,
+  etatDuDossier,
+  nomComplet,
+  type EtatEtudiant,
+} from "@/components/etudiant/commun";
+import { Inclinable } from "@/components/Inclinable";
+import { Logo } from "@/components/Logo";
+import { Nombre } from "@/components/Nombre";
+import { CLASSE_LIEN } from "@/components/styles";
+import {
   Carte,
   Chargement,
   EnTete,
-  Erreur,
-  formaterDate,
+  LIBELLE_STATUT_INSCRIPTION,
   Vide,
 } from "@/components/ui";
-import { useRessource } from "@/hooks/useRessource";
-import { MESSAGE_ACCES_REFUSE } from "@/services/api";
+import { useEtudiantConnecte } from "@/hooks/useEtudiantConnecte";
 import { useAuthStore } from "@/stores/authStore";
-import type { Etudiant, Inscription } from "@/types";
+import type { Etudiant, Inscription, StatutInscription } from "@/types";
 
-const CLASSE_TITRE_CARTE =
-  "border-b border-line px-5 py-4 font-display text-lg font-semibold text-ink";
-const CLASSE_FICHE = "grid gap-x-8 gap-y-4 px-5 py-5 sm:grid-cols-2 lg:grid-cols-3";
+const MESSAGE_STATUT: Record<StatutInscription, string> = {
+  EN_ATTENTE: "Votre inscription est en attente de validation par la scolarité.",
+  VALIDE: "Votre inscription est validée.",
+  REJETE:
+    "Votre inscription a été rejetée. Rapprochez-vous de la scolarité pour en connaître la raison.",
+  SUSPENDU:
+    "Votre inscription est suspendue. Rapprochez-vous de la scolarité pour la régulariser.",
+};
 
-// Le backend réserve aujourd'hui /etudiants et /inscriptions aux profils
-// administration et scolarité : un étudiant reçoit un 403 en demandant ses
-// propres données.
-function AvisAccesLimite({ sujet }: { sujet: string }) {
-  return (
-    <div
-      role="status"
-      className="m-5 rounded-md border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-ink"
-    >
-      <p className="font-semibold">{sujet} n&apos;est pas encore consultable ici.</p>
-      <p className="mt-1 text-muted">
-        Le serveur n&apos;autorise pas encore le profil étudiant à lire ses
-        propres données. En attendant, le service de scolarité de votre
-        établissement peut vous les communiquer.
-      </p>
-    </div>
-  );
-}
+const CLASSE_STATUT: Record<StatutInscription, string> = {
+  EN_ATTENTE: "border-amber-600/40 bg-amber-500/10 text-amber-900",
+  VALIDE: "border-primary/30 bg-primary/5 text-ink",
+  REJETE: "border-red-600/40 bg-red-600/10 text-red-800",
+  SUSPENDU: "border-red-600/40 bg-red-600/10 text-red-800",
+};
 
-function Echec({
-  message,
-  sujet,
-  onReessayer,
+const CLASSE_CARTE_STAT =
+  "flex h-full min-h-36 flex-col gap-2 rounded-xl border border-line bg-surface px-5 py-5 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_14px_32px_-18px_rgb(15_23_42/0.14)]";
+
+function CarteEtudiant({
+  etudiant,
+  nom,
+  inscription,
 }: {
-  message: string;
-  sujet: string;
-  onReessayer: () => void;
+  etudiant: Etudiant;
+  nom: string;
+  inscription: Inscription | null;
 }) {
-  if (message === MESSAGE_ACCES_REFUSE) return <AvisAccesLimite sujet={sujet} />;
   return (
-    <div className="p-5">
-      <Erreur message={message} onReessayer={onReessayer} />
+    <Inclinable className="rounded-2xl bg-primary p-6 text-on-primary shadow-[0_18px_40px_-20px_rgb(30_64_175/0.7)] sm:p-7">
+      <section aria-label="Carte d'étudiant">
+        <div className="flex items-start justify-between gap-4">
+          <Logo className="text-lg" />
+          <span className="rounded-full border border-white/50 px-3 py-0.5 text-xs font-semibold">
+            {inscription
+              ? LIBELLE_STATUT_INSCRIPTION[inscription.statut]
+              : "Sans inscription"}
+          </span>
+        </div>
+        <p className="mt-8 font-mono text-sm tracking-widest">
+          {etudiant.matricule}
+        </p>
+        <p className="mt-1 font-display text-2xl font-semibold break-words">
+          {nom}
+        </p>
+        <p className="mt-2 text-sm text-on-primary/90">
+          {inscription
+            ? [inscription.niveau?.nom, inscription.anneeAcademique?.libelle]
+                .filter(Boolean)
+                .join(" · ") || "—"
+            : "Aucun niveau pour le moment"}
+        </p>
+      </section>
+    </Inclinable>
+  );
+}
+
+function Statut({ inscription }: { inscription: Inscription | null }) {
+  if (!inscription) {
+    return (
+      <div
+        role="status"
+        className="rounded-md border border-line bg-wash px-4 py-3 text-sm text-ink"
+      >
+        Vous n&apos;avez pas encore d&apos;inscription.
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-3">
+      <div
+        role="status"
+        className={`rounded-md border px-4 py-3 text-sm font-semibold ${CLASSE_STATUT[inscription.statut]}`}
+      >
+        {MESSAGE_STATUT[inscription.statut]}
+      </div>
+      {!inscription.fraisPayes && (
+        <div
+          role="status"
+          className="rounded-md border border-amber-600/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900"
+        >
+          Les frais de scolarité ne sont pas encore réglés. Rapprochez-vous de
+          la scolarité.
+        </div>
+      )}
     </div>
   );
 }
 
-function Champ({ libelle, children }: { libelle: string; children: ReactNode }) {
+function Chiffre({
+  libelle,
+  valeur,
+  attente,
+}: {
+  libelle: string;
+  // null : donnée indisponible, affichée comme un tiret.
+  valeur: number | null;
+  attente?: boolean;
+}) {
   return (
-    <div className="min-w-0">
-      <dt className="text-sm text-muted">{libelle}</dt>
-      <dd className="mt-0.5 font-semibold break-words text-ink">{children}</dd>
-    </div>
+    <li>
+      <Inclinable className={CLASSE_CARTE_STAT}>
+        <p className="text-sm font-semibold text-muted">{libelle}</p>
+        <p className="font-display text-4xl font-semibold tracking-tight text-primary tabular-nums">
+          {valeur !== null ? (
+            <Nombre valeur={valeur} />
+          ) : attente ? (
+            <>
+              <span aria-hidden="true" className="text-muted">
+                …
+              </span>
+              <span className="sr-only">Chargement…</span>
+            </>
+          ) : (
+            <>
+              <span aria-hidden="true">—</span>
+              <span className="sr-only">Non disponible</span>
+            </>
+          )}
+        </p>
+      </Inclinable>
+    </li>
+  );
+}
+
+function ApercuMatieres({ matieres, recharger }: Pick<EtatEtudiant, "matieres" | "recharger">) {
+  const { donnees, chargement, erreur } = matieres;
+  if (erreur) {
+    return (
+      <div className="p-5">
+        <EchecDeChargement
+          message={erreur}
+          sujet="La liste de vos matières"
+          profil="étudiant"
+          onReessayer={recharger}
+        />
+      </div>
+    );
+  }
+  if (chargement && !donnees) {
+    return <Chargement texte="Chargement de vos matières…" />;
+  }
+  if (!donnees) {
+    return (
+      <Vide>
+        Aucune inscription : les matières de votre niveau apparaîtront ici.
+      </Vide>
+    );
+  }
+  if (donnees.length === 0) {
+    return <Vide>Aucune matière n&apos;est encore programmée pour votre niveau.</Vide>;
+  }
+  return (
+    <ul className="divide-y divide-line">
+      {donnees.slice(0, 4).map((matiere) => (
+        <li
+          key={matiere.id}
+          className="flex items-center justify-between gap-4 px-5 py-3"
+        >
+          <div className="min-w-0">
+            <p className="font-semibold break-words text-ink">{matiere.nom}</p>
+            <p className="font-mono text-sm text-muted">{matiere.code}</p>
+          </div>
+          <p className="shrink-0 text-sm font-semibold text-ink">
+            {matiere.credits} crédit{matiere.credits > 1 ? "s" : ""}
+          </p>
+        </li>
+      ))}
+    </ul>
   );
 }
 
 export default function EtudiantDashboardPage() {
   const user = useAuthStore((etat) => etat.user);
-  const etudiants = useRessource<Etudiant[]>("/etudiants");
-  const etudiant =
-    etudiants.donnees?.find((candidat) => candidat.userId === user?.id) ?? null;
-  // Second appel en attente tant que le dossier étudiant n'est pas connu.
-  const inscriptions = useRessource<Inscription[]>(
-    etudiant ? "/inscriptions" : null,
-  );
-  // Le backend renvoie les inscriptions de la plus récente à la plus ancienne.
-  const mesInscriptions = inscriptions.donnees?.filter(
-    (inscription) => inscription.etudiantId === etudiant?.id,
-  );
+  const etat = useEtudiantConnecte();
+  const { etudiant, inscriptions, inscriptionCourante, matieres } = etat;
+  const prenom = user?.prenom;
 
-  const prenom = user?.prenom ?? etudiant?.user?.prenom;
-
-  function dossier() {
-    if (etudiants.chargement) {
-      return <Chargement texte="Chargement de votre dossier…" />;
-    }
-    if (etudiants.erreur) {
-      return (
-        <Echec
-          message={etudiants.erreur}
-          sujet="Votre dossier"
-          onReessayer={etudiants.recharger}
-        />
-      );
-    }
-    if (!etudiant) {
-      return (
-        <Vide>
-          Aucun dossier étudiant n&apos;est rattaché à votre compte. Le service
-          de scolarité peut vérifier votre situation.
-        </Vide>
-      );
-    }
+  const entete = (
+    <EnTete
+      titre={prenom ? `Bonjour ${prenom}` : "Tableau de bord"}
+      texte="Votre carte, votre inscription et vos matières en un coup d'œil."
+    />
+  );
+  const bloquant = etatDuDossier(etat, "Votre dossier");
+  if (bloquant || !etudiant) {
     return (
-      <dl className={CLASSE_FICHE}>
-        <Champ libelle="Matricule">
-          <span className="font-mono">{etudiant.matricule}</span>
-        </Champ>
-        <Champ libelle="Nom">
-          {etudiant.user
-            ? `${etudiant.user.prenom} ${etudiant.user.nom}`
-            : "—"}
-        </Champ>
-        <Champ libelle="E-mail">{etudiant.user?.email ?? "—"}</Champ>
-        <Champ libelle="Date de naissance">
-          {formaterDate(etudiant.dateNaissance, { calendaire: true })}
-        </Champ>
-        <Champ libelle="Lieu de naissance">{etudiant.lieuNaissance}</Champ>
-        <Champ libelle="Nationalité">{etudiant.nationalite}</Champ>
-      </dl>
+      <>
+        {entete}
+        {bloquant}
+      </>
     );
   }
 
-  function inscription() {
-    if (inscriptions.erreur) {
-      return (
-        <Echec
-          message={inscriptions.erreur}
-          sujet="Votre inscription"
-          onReessayer={inscriptions.recharger}
-        />
-      );
-    }
-    if (!mesInscriptions) {
-      return <Chargement texte="Chargement de votre inscription…" />;
-    }
-    if (mesInscriptions.length === 0) {
-      return (
-        <Vide>
-          Vous n&apos;avez pas encore d&apos;inscription enregistrée. Le service
-          de scolarité l&apos;ajoutera à votre dossier.
-        </Vide>
-      );
-    }
-    return (
-      <ul className="divide-y divide-line">
-        {mesInscriptions.map((element) => (
-          <li key={element.id}>
-            <dl className={CLASSE_FICHE}>
-              <Champ libelle="Niveau">{element.niveau?.nom ?? "—"}</Champ>
-              <Champ libelle="Année académique">
-                {element.anneeAcademique?.libelle ?? "—"}
-              </Champ>
-              <Champ libelle="Date d'inscription">
-                {formaterDate(element.dateInscription)}
-              </Champ>
-              <Champ libelle="Statut">
-                <BadgeInscription statut={element.statut} />
-              </Champ>
-              <Champ libelle="Frais payés">
-                {element.fraisPayes ? "Oui" : "Non"}
-              </Champ>
-            </dl>
-          </li>
-        ))}
-      </ul>
-    );
-  }
+  const nom = nomComplet(etudiant, user ?? undefined);
+  const donneesMatieres = matieres.erreur ? null : matieres.donnees;
+  const attente = matieres.chargement && !matieres.donnees;
 
   return (
-    <div>
-      <EnTete
-        titre="Tableau de bord"
-        texte={
-          prenom
-            ? `Bonjour ${prenom}, voici votre dossier et votre inscription.`
-            : "Votre dossier et votre inscription."
-        }
-      />
+    <>
+      {entete}
+
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[minmax(0,26rem)_1fr]">
+        <CarteEtudiant
+          etudiant={etudiant}
+          nom={nom}
+          inscription={inscriptionCourante}
+        />
+        <Statut inscription={inscriptionCourante} />
+      </div>
+
+      <ul className="mt-6 grid gap-4 sm:grid-cols-3">
+        <Chiffre
+          libelle="Matières de mon niveau"
+          valeur={donneesMatieres ? donneesMatieres.length : null}
+          attente={attente}
+        />
+        <Chiffre
+          libelle="Crédits à valider"
+          valeur={
+            donneesMatieres
+              ? donneesMatieres.reduce((somme, m) => somme + m.credits, 0)
+              : null
+          }
+          attente={attente}
+        />
+        <Chiffre libelle="Inscriptions" valeur={inscriptions.length} />
+      </ul>
 
       <Carte className="mt-6">
-        <h2 className={CLASSE_TITRE_CARTE}>Mon dossier</h2>
-        {dossier()}
+        <h2 className={CLASSE_TITRE_CARTE}>Mes matières</h2>
+        <ApercuMatieres matieres={matieres} recharger={etat.recharger} />
+        <nav
+          aria-label="Accès rapides"
+          className="flex flex-wrap gap-x-6 gap-y-3 border-t border-line px-5 py-4"
+        >
+          <Link href="/etudiant/matieres" className={CLASSE_LIEN}>
+            Voir toutes mes matières
+          </Link>
+          <Link href="/etudiant/dossier" className={CLASSE_LIEN}>
+            Mon dossier
+          </Link>
+          <Link href="/etudiant/inscriptions" className={CLASSE_LIEN}>
+            Mes inscriptions
+          </Link>
+        </nav>
       </Carte>
-
-      {/* Sans dossier, il n'y a pas d'inscription à chercher. */}
-      {etudiant && (
-        <Carte className="mt-6">
-          <h2 className={CLASSE_TITRE_CARTE}>
-            {mesInscriptions && mesInscriptions.length > 1
-              ? "Mes inscriptions"
-              : "Mon inscription"}
-          </h2>
-          {inscription()}
-        </Carte>
-      )}
-    </div>
+    </>
   );
 }
