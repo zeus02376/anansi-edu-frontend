@@ -2,12 +2,10 @@
 
 import { useEffect } from "react";
 import type { ReactNode } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ACCUEIL_PAR_ROLE, LIBELLE_ROLE } from "@/lib/roles";
+import { ACCUEIL_PAR_ROLE } from "@/lib/roles";
 import type { Role } from "@/lib/roles";
 import { useAuthStore } from "@/stores/authStore";
-import { CLASSE_BOUTON_PRINCIPAL, CLASSE_TITRE } from "@/components/styles";
 
 function Attente() {
   return (
@@ -25,8 +23,10 @@ function Attente() {
 }
 
 // Réserve une page aux personnes connectées et, si `roles` est fourni, à
-// celles qui ont l'un de ces rôles. C'est un confort d'affichage : la vraie
-// barrière est le backend, qui vérifie le jeton et le rôle à chaque requête.
+// celles qui ont l'un de ces rôles. Sans connexion, on va sur /login ; avec
+// un rôle non autorisé, sur le tableau de bord de son propre rôle. C'est un
+// confort d'affichage : la vraie barrière est le backend, qui vérifie le
+// jeton et le rôle à chaque requête.
 export function ProtectedRoute({
   roles,
   children,
@@ -39,34 +39,21 @@ export function ProtectedRoute({
   const isAuthenticated = useAuthStore((etat) => etat.isAuthenticated);
   const role = useAuthStore((etat) => etat.user?.role);
 
-  const doitSeConnecter = estPret && !isAuthenticated;
+  const autorise =
+    isAuthenticated && role !== undefined && (!roles || roles.includes(role));
+  // Où envoyer la personne si elle n'a pas sa place ici.
+  const destination = !estPret || autorise
+    ? null
+    : isAuthenticated && role
+      ? ACCUEIL_PAR_ROLE[role]
+      : "/login";
 
   useEffect(() => {
-    if (doitSeConnecter) router.replace("/login");
-  }, [doitSeConnecter, router]);
+    if (destination) router.replace(destination);
+  }, [destination, router]);
 
-  if (!estPret || !isAuthenticated || !role) {
+  if (!estPret || !autorise) {
     return <Attente />;
-  }
-
-  if (roles && !roles.includes(role)) {
-    return (
-      <main className="flex flex-1 items-center justify-center px-6 py-16">
-        <div className="max-w-md">
-          <h1 className={CLASSE_TITRE}>Accès refusé</h1>
-          <p className="mt-3 text-base text-muted">
-            Cette page est réservée à d&apos;autres profils. Vous êtes
-            connecté en tant que {LIBELLE_ROLE[role].toLowerCase()}.
-          </p>
-          <Link
-            href={ACCUEIL_PAR_ROLE[role]}
-            className={`${CLASSE_BOUTON_PRINCIPAL} mt-6`}
-          >
-            Revenir à mon tableau de bord
-          </Link>
-        </div>
-      </main>
-    );
   }
 
   return <>{children}</>;
