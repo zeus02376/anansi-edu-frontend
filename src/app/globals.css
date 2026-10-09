@@ -1,48 +1,40 @@
 @import "tailwindcss";
 
+/* L'interface est en bleu et blanc uniquement : la variante `dark:` ne
+   s'active que si une classe .dark est posée, jamais selon le système. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --paper: #f6f7fb;
+  --paper: #ffffff;
+  --wash: #f1f5f9;
   --surface: #ffffff;
-  --ink: #14162e;
-  --muted: #565b7a;
-  --line: #d5d8e6;
-  --field: #7f84a6;
-  --panel: #1b1f4b;
-  --gold: #e0a526;
-  --primary: #1b1f4b;
-  --on-primary: #f6f7fb;
+  --ink: #0f172a;
+  --muted: #475569;
+  --line: #e2e8f0;
+  --field: #64748b;
+  --panel: #1e40af;
+  --accent: #93c5fd;
+  --primary: #1e40af;
+  --on-primary: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--paper);
   --color-foreground: var(--ink);
   --color-paper: var(--paper);
+  --color-wash: var(--wash);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-field: var(--field);
   --color-panel: var(--panel);
-  --color-gold: var(--gold);
+  --color-accent: var(--accent);
   --color-primary: var(--primary);
   --color-on-primary: var(--on-primary);
   --font-sans: var(--font-instrument-sans);
   --font-display: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0e1026;
-    --surface: #161935;
-    --ink: #ecedf7;
-    --muted: #a3a8c7;
-    --line: #2c3058;
-    --field: #6a6fa0;
-    --panel: #171a40;
-    --primary: #e0a526;
-    --on-primary: #14162e;
-  }
 }
 
 body {
@@ -51,7 +43,7 @@ body {
   font-family: var(--font-instrument-sans), system-ui, sans-serif;
 }
 
-/* Le fil d'or qui relie les étapes : horizontal sur mobile, vertical sur
+/* La ligne qui relie les étapes : horizontale sur mobile, verticale sur
    grand écran. --avancement va de 0 (première étape) à 1 (dernière). */
 .fil-avancement {
   transform: scaleX(var(--avancement, 0));
@@ -63,12 +55,6 @@ body {
   .fil-avancement {
     transform: scaleY(var(--avancement, 0));
     transform-origin: top;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .fil-avancement {
-    transition: none;
   }
 }
 
@@ -108,6 +94,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fil-avancement {
+    transition: none;
+  }
+
   .etape-entree,
   .coche-tracee,
   .apparition {

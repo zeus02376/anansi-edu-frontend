@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Cadre } from "../_components/cadre";
+import { Cadre } from "@/components/Cadre";
 import {
   CLASSE_BOUTON_PRINCIPAL,
   CLASSE_BOUTON_SECONDAIRE,
@@ -15,7 +15,7 @@ import {
   CLASSE_LIBELLE,
   CLASSE_LIEN,
   CLASSE_TITRE,
-} from "../_components/styles";
+} from "@/components/styles";
 
 // Listes en dur pour l'instant : elles viendront du backend plus tard.
 const FILIERES = [
@@ -247,11 +247,11 @@ function ChampFichier({
         onDragEnter={() => setSurvol(true)}
         onDragLeave={() => setSurvol(false)}
         onDrop={() => setSurvol(false)}
-        className={`relative flex min-h-16 items-center gap-3 rounded-md border px-3.5 py-3 transition-[border-color,background-color,box-shadow] duration-150 has-[:focus-visible]:border-ink has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-gold/40 has-[[aria-invalid=true]]:border-red-700 dark:has-[[aria-invalid=true]]:border-red-400 ${
+        className={`relative flex min-h-16 items-center gap-3 rounded-md border px-3.5 py-3 transition-[border-color,background-color,box-shadow] duration-150 has-[:focus-visible]:border-primary has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-primary/25 has-[[aria-invalid=true]]:border-red-700 dark:has-[[aria-invalid=true]]:border-red-400 ${
           choisi
             ? "border-field bg-surface"
             : "border-dashed border-field bg-surface/60 hover:border-ink hover:bg-surface"
-        } ${survol ? "border-ink bg-gold/10" : ""}`}
+        } ${survol ? "border-primary bg-primary/5" : ""}`}
       >
         <input
           id={id}
@@ -278,7 +278,7 @@ function ChampFichier({
           <>
             <span
               aria-hidden="true"
-              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gold/20 text-ink"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary"
             >
               <Coche className="size-4" />
             </span>
@@ -461,7 +461,7 @@ export default function CandidaturePage() {
             aria-hidden="true"
             className="absolute top-1/2 right-3.5 left-3.5 h-0.5 -translate-y-1/2 bg-white/20 lg:top-6 lg:right-auto lg:bottom-6 lg:left-[13px] lg:h-auto lg:w-0.5 lg:translate-y-0"
           >
-            <span className="fil-avancement block size-full bg-gold" />
+            <span className="fil-avancement block size-full bg-white" />
           </li>
           {ETAPES.map(({ titre }, index) => {
             const faite = index < etape;
@@ -471,9 +471,9 @@ export default function CandidaturePage() {
                 aria-hidden="true"
                 className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-[background-color,box-shadow,color] duration-300 ${
                   faite
-                    ? "bg-gold text-panel"
+                    ? "bg-white text-panel"
                     : courante
-                      ? "bg-white text-panel ring-4 ring-gold/50"
+                      ? "bg-white text-panel ring-4 ring-white/35"
                       : "border-2 border-white/35 bg-panel text-white/60"
                 }`}
               >
@@ -507,7 +507,7 @@ export default function CandidaturePage() {
                   >
                     {pastille}
                     <span className="sr-only">Revenir à l&apos;étape : </span>
-                    <span className="decoration-gold decoration-2 underline-offset-4 group-hover:underline">
+                    <span className="decoration-primary decoration-2 underline-offset-4 group-hover:underline">
                       {libelle}
                     </span>
                   </button>
@@ -598,7 +598,7 @@ export default function CandidaturePage() {
                     className="peer sr-only"
                     {...register("sexe")}
                   />
-                  <span className="block rounded-md border border-field bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition-[background-color,border-color,color,box-shadow] duration-150 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-hover:border-ink peer-focus-visible:ring-3 peer-focus-visible:ring-gold/50">
+                  <span className="block rounded-md border border-field bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition-[background-color,border-color,color,box-shadow] duration-150 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-hover:border-ink peer-focus-visible:ring-3 peer-focus-visible:ring-primary/30">
                     {sexe}
                   </span>
                 </label>

@@ -18,7 +18,7 @@ export function Cadre({
       <aside className="bg-panel px-6 py-6 text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-[38%] lg:max-w-md lg:flex-col lg:px-10 lg:py-12">
         <div>
           <p className="flex items-center gap-2.5 font-display text-xl font-bold tracking-wide">
-            <span aria-hidden="true" className="size-2.5 rounded-full bg-gold" />
+            <span aria-hidden="true" className="size-2.5 rounded-full bg-accent" />
             ANANSI EDU
           </p>
           <p className="mt-2 max-w-[30ch] text-sm leading-relaxed text-white/75 lg:mt-4 lg:text-base">

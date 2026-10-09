@@ -4,14 +4,14 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Cadre } from "../_components/cadre";
+import { Cadre } from "@/components/Cadre";
 import {
   CLASSE_BOUTON_PRINCIPAL,
   CLASSE_CHAMP,
   CLASSE_ERREUR,
   CLASSE_LIBELLE,
   CLASSE_TITRE,
-} from "../_components/styles";
+} from "@/components/styles";
 
 const loginSchema = z.object({
   email: z
