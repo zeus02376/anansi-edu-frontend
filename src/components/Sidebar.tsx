@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { Role } from "@/lib/roles";
+import { Logo } from "@/components/Logo";
 
 type Lien = { href: string; libelle: string };
 type Groupe = { titre?: string; liens: Lien[] };
@@ -62,9 +63,8 @@ export function Sidebar({
           ouvert ? "translate-x-0" : "invisible -translate-x-full lg:visible"
         }`}
       >
-        <p className="flex h-16 shrink-0 items-center gap-2.5 px-6 font-display text-lg font-bold tracking-wide">
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-accent" />
-          ANANSI
+        <p className="flex h-16 shrink-0 items-center px-6">
+          <Logo className="text-lg" />
         </p>
 
         <nav
@@ -74,7 +74,7 @@ export function Sidebar({
           {NAVIGATION[role].map((groupe, index) => (
             <div key={groupe.titre ?? index} className="mt-4 first:mt-2">
               {groupe.titre && (
-                <p className="px-3 pb-1.5 text-sm font-semibold text-white/60">
+                <p className="px-3 pb-1.5 text-sm font-semibold text-white/75">
                   {groupe.titre}
                 </p>
               )}
@@ -87,10 +87,10 @@ export function Sidebar({
                         href={href}
                         onClick={onFermer}
                         aria-current={actif ? "page" : undefined}
-                        className={`block rounded-md px-3 py-2 text-sm font-medium outline-hidden transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-white ${
+                        className={`block rounded-md px-3 py-2 text-sm font-medium outline-hidden transition-[background-color,color,translate,box-shadow] duration-150 focus-visible:ring-2 focus-visible:ring-white ${
                           actif
-                            ? "bg-white text-primary"
-                            : "text-white/85 hover:bg-white/10 hover:text-white"
+                            ? "bg-white text-primary shadow-[0_3px_0_0_rgb(8_20_80/0.35)]"
+                            : "text-white/85 hover:translate-x-1 hover:bg-white/10 hover:text-white"
                         }`}
                       >
                         {libelle}

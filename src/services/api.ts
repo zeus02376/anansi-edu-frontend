@@ -46,7 +46,10 @@ export const MESSAGE_ACCES_REFUSE =
 function messageDuBackend(donnees: unknown): string | null {
   if (typeof donnees !== "object" || donnees === null) return null;
   const { message } = donnees as { message?: unknown };
-  return typeof message === "string" && message.trim() ? message : null;
+  if (typeof message !== "string" || !message.trim()) return null;
+  // « Cannot GET /chemin » : réponse par défaut de Nest pour une route
+  // inconnue, en anglais.
+  return /^Cannot [A-Z]+ /.test(message) ? null : message;
 }
 
 // Traduit n'importe quel échec d'appel en une phrase lisible.

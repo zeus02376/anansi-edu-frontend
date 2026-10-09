@@ -33,7 +33,7 @@ export function Carte({
 }) {
   return (
     <section
-      className={`rounded-lg border border-line bg-surface ${className}`}
+      className={`rounded-xl border border-line bg-surface shadow-[0_1px_2px_rgb(15_23_42/0.04),0_14px_32px_-18px_rgb(15_23_42/0.14)] ${className}`}
     >
       {children}
     </section>
@@ -138,18 +138,24 @@ export function BadgeInscription({ statut }: { statut: StatutInscription }) {
 // Classes des tableaux de données. Envelopper le <table> dans
 // <div className={CLASSE_TABLEAU_DEFILANT}> pour le défilement sur mobile.
 export const CLASSE_TABLEAU_DEFILANT = "overflow-x-auto";
-export const CLASSE_TABLEAU = "w-full min-w-[40rem] text-left text-sm";
+export const CLASSE_TABLEAU = "tableau-donnees w-full min-w-[40rem] text-left text-sm";
 export const CLASSE_TH =
   "border-b border-line px-5 py-3 text-sm font-semibold whitespace-nowrap text-muted";
 export const CLASSE_TD = "border-b border-line px-5 py-3 align-middle text-ink";
 
-export function formaterDate(iso: string): string {
+// `calendaire` : pour une date sans heure (date de naissance), enregistrée
+// à minuit UTC, qu'il ne faut pas décaler selon le fuseau du navigateur.
+// Les autres dates sont des instants, affichés à l'heure locale.
+export function formaterDate(
+  iso: string,
+  { calendaire = false }: { calendaire?: boolean } = {},
+): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString("fr-FR", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
-    timeZone: "UTC",
+    timeZone: calendaire ? "UTC" : undefined,
   });
 }

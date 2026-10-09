@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ANANSI EDU",
-  description: "Candidature et espace personnel ANANSI EDU.",
+  title: "ANANSI",
+  description: "Candidature et espace personnel ANANSI.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

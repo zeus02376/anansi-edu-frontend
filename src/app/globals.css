@@ -93,7 +93,104 @@ body {
   animation: apparition 280ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
+/* Scène 3D de la page de connexion : le plateau pivote selon --rx / --ry
+   (posés par Scene3D.tsx) et chaque couche est placée en profondeur par --z. */
+.scene3d {
+  perspective: 1100px;
+}
+
+.scene3d-plateau {
+  transform-style: preserve-3d;
+  transform: rotateX(calc(14deg + var(--rx, 0deg)))
+    rotateY(calc(-22deg + var(--ry, 0deg)));
+  transition: transform 300ms ease-out;
+}
+
+.scene3d-couche {
+  position: absolute;
+  transform: translateZ(var(--z, 0px));
+  transform-style: preserve-3d;
+}
+
+.scene3d-grille {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.scene3d-anneau {
+  background: conic-gradient(#fff 0 68%, rgb(255 255 255 / 0.25) 68% 100%);
+  mask: radial-gradient(circle, transparent 50%, #000 52%);
+}
+
+@keyframes flottement {
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.flottement {
+  animation: flottement 6s ease-in-out infinite;
+}
+
+/* Carte qui s'incline vers le pointeur (Inclinable.tsx). */
+.inclinable {
+  position: relative;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition:
+    transform 180ms ease-out,
+    box-shadow 180ms ease-out,
+    border-color 180ms ease-out;
+}
+
+.inclinable::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--reflet-x, 50%) var(--reflet-y, 50%),
+    rgb(30 64 175 / 0.1),
+    transparent 55%
+  );
+  opacity: 0;
+  transition: opacity 200ms ease-out;
+}
+
+@media (hover: hover) {
+  .inclinable:hover {
+    border-color: rgb(30 64 175 / 0.35);
+    box-shadow: 0 24px 40px -22px rgb(30 64 175 / 0.45);
+  }
+
+  .inclinable:hover::after {
+    opacity: 1;
+  }
+
+  .tableau-donnees tbody tr:hover td {
+    background-color: rgb(30 64 175 / 0.04);
+  }
+}
+
+.tableau-donnees tbody td {
+  transition: background-color 120ms ease-out;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .scene3d-plateau {
+    transition: none;
+  }
+
+  .flottement {
+    animation: none;
+  }
+
+  .inclinable {
+    transform: none;
+  }
+
   .fil-avancement {
     transition: none;
   }

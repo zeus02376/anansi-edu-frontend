@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Cadre } from "@/components/Cadre";
+import { Scene3D } from "@/components/Scene3D";
 import {
   CLASSE_BOUTON_PRINCIPAL,
   CLASSE_CHAMP,
@@ -92,6 +93,7 @@ export default function LoginPage() {
     <Cadre
       texte="Gestion académique : candidatures, inscriptions, enseignements."
       accroche="Bon retour parmi nous."
+      decor={<Scene3D />}
     >
       <div className="lg:flex lg:min-h-[calc(100vh-8rem)] lg:flex-col lg:justify-center">
         <h1 className={CLASSE_TITRE}>Connexion</h1>
