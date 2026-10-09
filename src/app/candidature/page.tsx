@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, FormEvent, ReactNode } from "react";
 import { useForm } from "react-hook-form";
-import type { FieldError } from "react-hook-form";
+import type { FieldError, UseFormRegisterReturn } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Cadre } from "../_components/cadre";
@@ -12,8 +12,8 @@ import {
   CLASSE_BOUTON_SECONDAIRE,
   CLASSE_CHAMP,
   CLASSE_ERREUR,
-  CLASSE_FICHIER,
   CLASSE_LIBELLE,
+  CLASSE_LIEN,
   CLASSE_TITRE,
 } from "../_components/styles";
 
@@ -167,13 +167,11 @@ function Champ({
   id,
   libelle,
   erreur,
-  aide,
   children,
 }: {
   id: string;
   libelle: string;
   erreur: FieldError | undefined;
-  aide?: string;
   children: ReactNode;
 }) {
   return (
@@ -182,7 +180,132 @@ function Champ({
         {libelle}
       </label>
       {children}
-      {aide && <p className="text-sm text-muted">{aide}</p>}
+      <MessageErreur id={id} erreur={erreur} />
+    </div>
+  );
+}
+
+function Coche({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M3.5 8.5l3 3 6-7" />
+    </svg>
+  );
+}
+
+function formaterTaille(octets: number): string {
+  if (octets < 1024 * 1024) {
+    return `${Math.max(1, Math.round(octets / 1024))} Ko`;
+  }
+  return `${(octets / (1024 * 1024)).toFixed(1).replace(".", ",")} Mo`;
+}
+
+// Zone de dépôt : le champ de fichier natif, invisible, recouvre toute la
+// zone. Le clic, le clavier et le glisser-déposer restent donc ceux du
+// navigateur ; on ne fait qu'habiller le résultat.
+function ChampFichier({
+  id,
+  libelle,
+  erreur,
+  champ,
+}: {
+  id: string;
+  libelle: string;
+  erreur: FieldError | undefined;
+  champ: UseFormRegisterReturn;
+}) {
+  const entree = useRef<HTMLInputElement | null>(null);
+  const [choisi, setChoisi] = useState<{ nom: string; taille: number } | null>(
+    null,
+  );
+  const [survol, setSurvol] = useState(false);
+
+  function retirer() {
+    const element = entree.current;
+    if (!element) return;
+    element.value = "";
+    setChoisi(null);
+    void champ.onChange({ target: element, type: "change" });
+    element.focus();
+  }
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className={CLASSE_LIBELLE}>
+        {libelle}
+      </label>
+      <div
+        onDragEnter={() => setSurvol(true)}
+        onDragLeave={() => setSurvol(false)}
+        onDrop={() => setSurvol(false)}
+        className={`relative flex min-h-16 items-center gap-3 rounded-md border px-3.5 py-3 transition-[border-color,background-color,box-shadow] duration-150 has-[:focus-visible]:border-ink has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-gold/40 has-[[aria-invalid=true]]:border-red-700 dark:has-[[aria-invalid=true]]:border-red-400 ${
+          choisi
+            ? "border-field bg-surface"
+            : "border-dashed border-field bg-surface/60 hover:border-ink hover:bg-surface"
+        } ${survol ? "border-ink bg-gold/10" : ""}`}
+      >
+        <input
+          id={id}
+          type="file"
+          accept={ACCEPT_FICHIER}
+          className="absolute inset-0 size-full cursor-pointer opacity-0"
+          {...attributsErreur(id, erreur)}
+          name={champ.name}
+          onBlur={champ.onBlur}
+          onChange={(evenement) => {
+            const document = evenement.target.files?.[0];
+            setChoisi(
+              document ? { nom: document.name, taille: document.size } : null,
+            );
+            void champ.onChange(evenement);
+          }}
+          ref={(element) => {
+            champ.ref(element);
+            entree.current = element;
+          }}
+        />
+
+        {choisi ? (
+          <>
+            <span
+              aria-hidden="true"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gold/20 text-ink"
+            >
+              <Coche className="size-4" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-ink">
+                {choisi.nom}
+              </span>
+              <span className="block text-sm text-muted">
+                {formaterTaille(choisi.taille)}
+              </span>
+            </span>
+            <button
+              type="button"
+              onClick={retirer}
+              className={`${CLASSE_LIEN} relative`}
+            >
+              Retirer
+              <span className="sr-only"> : {libelle}</span>
+            </button>
+          </>
+        ) : (
+          <span className="text-sm text-muted">
+            <span className="font-semibold text-ink">Choisir un fichier</span>{" "}
+            ou le glisser ici
+          </span>
+        )}
+      </div>
       <MessageErreur id={id} erreur={erreur} />
     </div>
   );
@@ -197,40 +320,29 @@ function nomDuFichier(fichiers: FileList | undefined): string {
   return fichiers?.[0]?.name ?? "Non fourni";
 }
 
+// Une section par étape de saisie, dans le même ordre que ETAPES.
 function lignesDuRecapitulatif(valeurs: CandidatureSaisie) {
   return [
-    {
-      titre: "Identité",
-      lignes: [
-        ["Nom", valeurs.nom.trim()],
-        ["Prénom", valeurs.prenom.trim()],
-        ["Date de naissance", formaterDate(valeurs.dateNaissance)],
-        ["Sexe", valeurs.sexe],
-      ],
-    },
-    {
-      titre: "Coordonnées",
-      lignes: [
-        ["Téléphone", valeurs.telephone.trim()],
-        ["E-mail", valeurs.email.trim()],
-        ["Adresse", valeurs.adresse.trim()],
-      ],
-    },
-    {
-      titre: "Formation souhaitée",
-      lignes: [
-        ["Filière", valeurs.filiere],
-        ["Niveau", valeurs.niveau],
-      ],
-    },
-    {
-      titre: "Documents",
-      lignes: [
-        ["Pièce d'identité", nomDuFichier(valeurs.pieceIdentite)],
-        ["Dernier diplôme", nomDuFichier(valeurs.dernierDiplome)],
-        ["Photo d'identité", nomDuFichier(valeurs.photoIdentite)],
-      ],
-    },
+    [
+      ["Nom", valeurs.nom.trim()],
+      ["Prénom", valeurs.prenom.trim()],
+      ["Date de naissance", formaterDate(valeurs.dateNaissance)],
+      ["Sexe", valeurs.sexe],
+    ],
+    [
+      ["Téléphone", valeurs.telephone.trim()],
+      ["E-mail", valeurs.email.trim()],
+      ["Adresse", valeurs.adresse.trim()],
+    ],
+    [
+      ["Filière", valeurs.filiere],
+      ["Niveau", valeurs.niveau],
+    ],
+    [
+      ["Pièce d'identité", nomDuFichier(valeurs.pieceIdentite)],
+      ["Dernier diplôme", nomDuFichier(valeurs.dernierDiplome)],
+      ["Photo d'identité", nomDuFichier(valeurs.photoIdentite)],
+    ],
   ];
 }
 
@@ -238,6 +350,7 @@ type Recapitulatif = ReturnType<typeof lignesDuRecapitulatif>;
 
 export default function CandidaturePage() {
   const [etape, setEtape] = useState(0);
+  const [sens, setSens] = useState(1);
   const [recapitulatif, setRecapitulatif] = useState<Recapitulatif | null>(
     null,
   );
@@ -300,15 +413,19 @@ export default function CandidaturePage() {
         setRecapitulatif(lignesDuRecapitulatif(getValues()));
         arriveeAuRecapitulatif.current = performance.now();
       }
+      setSens(1);
       setEtape(suivante);
     } finally {
       validationEnCours.current = false;
     }
   }
 
-  function allerALEtapePrecedente() {
+  // Retour vers une étape déjà remplie (bouton « Précédent », fil des
+  // étapes ou lien « Modifier » du récapitulatif).
+  function revenirALEtape(cible: number) {
     setDossierPret(false);
-    setEtape(etape - 1);
+    setSens(-1);
+    setEtape(cible);
   }
 
   function soumettre(evenement: FormEvent<HTMLFormElement>) {
@@ -329,9 +446,12 @@ export default function CandidaturePage() {
     void handleSubmit(() => setDossierPret(true))(evenement);
   }
 
+  const classeEtape = "etape-entree mt-6 flex flex-col gap-5";
+
   return (
     <Cadre
       texte="Cinq étapes pour préparer votre dossier. Vous pouvez revenir en arrière à tout moment."
+      pied="Rien n'est envoyé pour l'instant : vos réponses restent dans cette page jusqu'à la fin."
       fil={
         <ol
           className="relative flex justify-between lg:flex-col lg:justify-start"
@@ -339,45 +459,78 @@ export default function CandidaturePage() {
         >
           <li
             aria-hidden="true"
-            className="absolute top-1/2 right-1.5 left-1.5 h-px -translate-y-1/2 bg-white/25 lg:top-5 lg:right-auto lg:bottom-5 lg:left-[5.5px] lg:h-auto lg:w-px lg:translate-y-0"
+            className="absolute top-1/2 right-3.5 left-3.5 h-0.5 -translate-y-1/2 bg-white/20 lg:top-6 lg:right-auto lg:bottom-6 lg:left-[13px] lg:h-auto lg:w-0.5 lg:translate-y-0"
           >
             <span className="fil-avancement block size-full bg-gold" />
           </li>
-          {ETAPES.map(({ titre }, index) => (
-            <li
-              key={titre}
-              aria-current={index === etape ? "step" : undefined}
-              className="relative flex items-center gap-4 lg:h-10"
-            >
+          {ETAPES.map(({ titre }, index) => {
+            const faite = index < etape;
+            const courante = index === etape;
+            const pastille = (
               <span
                 aria-hidden="true"
-                className={
-                  index < etape
-                    ? "size-3 rounded-full bg-gold"
-                    : index === etape
-                      ? "size-3 rounded-full bg-gold ring-4 ring-gold/30"
-                      : "size-3 rounded-full border border-white/50 bg-panel"
-                }
-              />
-              <span
-                className={
-                  index === etape
-                    ? "sr-only font-semibold text-white lg:not-sr-only"
-                    : index < etape
-                      ? "sr-only text-white/90 lg:not-sr-only"
-                      : "sr-only text-white/60 lg:not-sr-only"
-                }
+                className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-[background-color,box-shadow,color] duration-300 ${
+                  faite
+                    ? "bg-gold text-panel"
+                    : courante
+                      ? "bg-white text-panel ring-4 ring-gold/50"
+                      : "border-2 border-white/35 bg-panel text-white/60"
+                }`}
               >
-                {index + 1}. {titre}
+                {faite ? <Coche className="size-3.5" /> : index + 1}
               </span>
-            </li>
-          ))}
+            );
+            const libelle = (
+              <span
+                className={`sr-only lg:not-sr-only ${
+                  courante
+                    ? "font-semibold text-white"
+                    : faite
+                      ? "text-white/90"
+                      : "text-white/55"
+                }`}
+              >
+                {titre}
+              </span>
+            );
+            return (
+              <li
+                key={titre}
+                aria-current={courante ? "step" : undefined}
+                className="relative lg:h-12"
+              >
+                {faite ? (
+                  <button
+                    type="button"
+                    onClick={() => revenirALEtape(index)}
+                    className="group flex h-full items-center gap-4 rounded-full outline-hidden focus-visible:ring-2 focus-visible:ring-white lg:rounded-md lg:pr-3"
+                  >
+                    {pastille}
+                    <span className="sr-only">Revenir à l&apos;étape : </span>
+                    <span className="decoration-gold decoration-2 underline-offset-4 group-hover:underline">
+                      {libelle}
+                    </span>
+                  </button>
+                ) : (
+                  <div className="flex h-full items-center gap-4">
+                    {pastille}
+                    {libelle}
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ol>
       }
     >
       <h1 className={CLASSE_TITRE}>Dossier de candidature</h1>
 
-      <form onSubmit={soumettre} noValidate className="mt-8">
+      <form
+        onSubmit={soumettre}
+        noValidate
+        className="mt-8"
+        style={{ "--sens": sens } as CSSProperties}
+      >
         <p className="text-sm font-medium text-muted">
           Étape {etape + 1} sur {ETAPES.length}
         </p>
@@ -389,9 +542,10 @@ export default function CandidaturePage() {
           {ETAPES[etape].titre}
         </h2>
 
-          {/* Les étapes restent montées (seulement masquées) pour conserver
-              les fichiers déjà choisis quand on revient en arrière. */}
-          <div hidden={etape !== 0} className="mt-6 flex flex-col gap-5">
+        {/* Les étapes restent montées (seulement masquées) pour conserver
+            les fichiers déjà choisis quand on revient en arrière. */}
+        <div hidden={etape !== 0} className={classeEtape}>
+          <div className="grid gap-5 sm:grid-cols-2">
             <Champ id="nom" libelle="Nom" erreur={errors.nom}>
               <input
                 id="nom"
@@ -413,45 +567,49 @@ export default function CandidaturePage() {
                 {...register("prenom")}
               />
             </Champ>
-
-            <Champ
-              id="dateNaissance"
-              libelle="Date de naissance"
-              erreur={errors.dateNaissance}
-            >
-              <input
-                id="dateNaissance"
-                type="date"
-                autoComplete="bday"
-                className={CLASSE_CHAMP}
-                {...attributsErreur("dateNaissance", errors.dateNaissance)}
-                {...register("dateNaissance")}
-              />
-            </Champ>
-
-            <fieldset
-              className="flex flex-col gap-1.5"
-              aria-describedby={errors.sexe ? "sexe-erreur" : undefined}
-            >
-              <legend className={CLASSE_LIBELLE}>Sexe</legend>
-              <div className="mt-1.5 flex gap-6">
-                {SEXES.map((sexe) => (
-                  <label key={sexe} className="flex items-center gap-2 text-base">
-                    <input
-                      type="radio"
-                      className="size-4 accent-primary"
-                      value={sexe}
-                      {...register("sexe")}
-                    />
-                    {sexe}
-                  </label>
-                ))}
-              </div>
-              <MessageErreur id="sexe" erreur={errors.sexe} />
-            </fieldset>
           </div>
 
-          <div hidden={etape !== 1} className="mt-6 flex flex-col gap-5">
+          <Champ
+            id="dateNaissance"
+            libelle="Date de naissance"
+            erreur={errors.dateNaissance}
+          >
+            <input
+              id="dateNaissance"
+              type="date"
+              autoComplete="bday"
+              className={`${CLASSE_CHAMP} sm:max-w-60`}
+              {...attributsErreur("dateNaissance", errors.dateNaissance)}
+              {...register("dateNaissance")}
+            />
+          </Champ>
+
+          <fieldset
+            className="flex flex-col gap-1.5"
+            aria-describedby={errors.sexe ? "sexe-erreur" : undefined}
+          >
+            <legend className={CLASSE_LIBELLE}>Sexe</legend>
+            <div className="mt-1.5 flex gap-3">
+              {SEXES.map((sexe) => (
+                <label key={sexe} className="cursor-pointer">
+                  <input
+                    type="radio"
+                    value={sexe}
+                    className="peer sr-only"
+                    {...register("sexe")}
+                  />
+                  <span className="block rounded-md border border-field bg-surface px-5 py-2.5 text-sm font-semibold text-ink transition-[background-color,border-color,color,box-shadow] duration-150 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-on-primary peer-hover:border-ink peer-focus-visible:ring-3 peer-focus-visible:ring-gold/50">
+                    {sexe}
+                  </span>
+                </label>
+              ))}
+            </div>
+            <MessageErreur id="sexe" erreur={errors.sexe} />
+          </fieldset>
+        </div>
+
+        <div hidden={etape !== 1} className={classeEtape}>
+          <div className="grid gap-5 sm:grid-cols-2">
             <Champ id="telephone" libelle="Téléphone" erreur={errors.telephone}>
               <input
                 id="telephone"
@@ -473,170 +631,158 @@ export default function CandidaturePage() {
                 {...register("email")}
               />
             </Champ>
-
-            <Champ id="adresse" libelle="Adresse" erreur={errors.adresse}>
-              <textarea
-                id="adresse"
-                rows={3}
-                autoComplete="street-address"
-                className={CLASSE_CHAMP}
-                {...attributsErreur("adresse", errors.adresse)}
-                {...register("adresse")}
-              />
-            </Champ>
           </div>
 
-          <div hidden={etape !== 2} className="mt-6 flex flex-col gap-5">
-            <Champ id="filiere" libelle="Filière" erreur={errors.filiere}>
-              <select
-                id="filiere"
-                defaultValue=""
-                className={CLASSE_CHAMP}
-                {...attributsErreur("filiere", errors.filiere)}
-                {...register("filiere")}
-              >
-                <option value="" disabled>
-                  Choisir une filière
+          <Champ id="adresse" libelle="Adresse" erreur={errors.adresse}>
+            <textarea
+              id="adresse"
+              rows={3}
+              autoComplete="street-address"
+              className={CLASSE_CHAMP}
+              {...attributsErreur("adresse", errors.adresse)}
+              {...register("adresse")}
+            />
+          </Champ>
+        </div>
+
+        <div hidden={etape !== 2} className={classeEtape}>
+          <Champ id="filiere" libelle="Filière" erreur={errors.filiere}>
+            <select
+              id="filiere"
+              defaultValue=""
+              className={CLASSE_CHAMP}
+              {...attributsErreur("filiere", errors.filiere)}
+              {...register("filiere")}
+            >
+              <option value="" disabled>
+                Choisir une filière
+              </option>
+              {FILIERES.map((filiere) => (
+                <option key={filiere} value={filiere}>
+                  {filiere}
                 </option>
-                {FILIERES.map((filiere) => (
-                  <option key={filiere} value={filiere}>
-                    {filiere}
-                  </option>
-                ))}
-              </select>
-            </Champ>
-
-            <Champ id="niveau" libelle="Niveau" erreur={errors.niveau}>
-              <select
-                id="niveau"
-                defaultValue=""
-                className={CLASSE_CHAMP}
-                {...attributsErreur("niveau", errors.niveau)}
-                {...register("niveau")}
-              >
-                <option value="" disabled>
-                  Choisir un niveau
-                </option>
-                {NIVEAUX.map((niveau) => (
-                  <option key={niveau} value={niveau}>
-                    {niveau}
-                  </option>
-                ))}
-              </select>
-            </Champ>
-          </div>
-
-          <div hidden={etape !== 3} className="mt-6 flex flex-col gap-5">
-            <p className="text-sm text-muted">
-              Formats acceptés : PDF, JPG ou PNG, 5 Mo maximum par fichier.
-            </p>
-
-            <Champ
-              id="pieceIdentite"
-              libelle="Pièce d'identité"
-              erreur={errors.pieceIdentite}
-            >
-              <input
-                id="pieceIdentite"
-                type="file"
-                accept={ACCEPT_FICHIER}
-                className={CLASSE_FICHIER}
-                {...attributsErreur("pieceIdentite", errors.pieceIdentite)}
-                {...register("pieceIdentite")}
-              />
-            </Champ>
-
-            <Champ
-              id="dernierDiplome"
-              libelle="Dernier diplôme ou relevé de notes"
-              erreur={errors.dernierDiplome}
-            >
-              <input
-                id="dernierDiplome"
-                type="file"
-                accept={ACCEPT_FICHIER}
-                className={CLASSE_FICHIER}
-                {...attributsErreur("dernierDiplome", errors.dernierDiplome)}
-                {...register("dernierDiplome")}
-              />
-            </Champ>
-
-            <Champ
-              id="photoIdentite"
-              libelle="Photo d'identité (facultatif)"
-              erreur={errors.photoIdentite}
-            >
-              <input
-                id="photoIdentite"
-                type="file"
-                accept={ACCEPT_FICHIER}
-                className={CLASSE_FICHIER}
-                {...attributsErreur("photoIdentite", errors.photoIdentite)}
-                {...register("photoIdentite")}
-              />
-            </Champ>
-          </div>
-
-          {etape === DERNIERE_ETAPE && recapitulatif && (
-            <div className="mt-6 flex flex-col gap-6">
-              <p className="text-sm text-muted">
-                Vérifiez vos informations avant de soumettre le dossier.
-              </p>
-              {recapitulatif.map(({ titre, lignes }) => (
-                <section key={titre}>
-                  <h3 className="font-display text-base font-semibold text-ink">
-                    {titre}
-                  </h3>
-                  <dl className="mt-2 divide-y divide-line rounded-md border border-line bg-surface text-sm">
-                    {lignes.map(([libelle, valeur]) => (
-                      <div
-                        key={libelle}
-                        className="flex flex-col gap-0.5 px-3 py-2 sm:flex-row sm:gap-4"
-                      >
-                        <dt className="text-muted sm:w-44 sm:shrink-0">
-                          {libelle}
-                        </dt>
-                        <dd className="break-words whitespace-pre-line">
-                          {valeur}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </section>
               ))}
-            </div>
+            </select>
+          </Champ>
+
+          <Champ id="niveau" libelle="Niveau" erreur={errors.niveau}>
+            <select
+              id="niveau"
+              defaultValue=""
+              className={CLASSE_CHAMP}
+              {...attributsErreur("niveau", errors.niveau)}
+              {...register("niveau")}
+            >
+              <option value="" disabled>
+                Choisir un niveau
+              </option>
+              {NIVEAUX.map((niveau) => (
+                <option key={niveau} value={niveau}>
+                  {niveau}
+                </option>
+              ))}
+            </select>
+          </Champ>
+        </div>
+
+        <div hidden={etape !== 3} className={classeEtape}>
+          <p className="text-sm text-muted">
+            Formats acceptés : PDF, JPG ou PNG, 5 Mo maximum par fichier.
+          </p>
+
+          <ChampFichier
+            id="pieceIdentite"
+            libelle="Pièce d'identité"
+            erreur={errors.pieceIdentite}
+            champ={register("pieceIdentite")}
+          />
+          <ChampFichier
+            id="dernierDiplome"
+            libelle="Dernier diplôme ou relevé de notes"
+            erreur={errors.dernierDiplome}
+            champ={register("dernierDiplome")}
+          />
+          <ChampFichier
+            id="photoIdentite"
+            libelle="Photo d'identité (facultatif)"
+            erreur={errors.photoIdentite}
+            champ={register("photoIdentite")}
+          />
+        </div>
+
+        {etape === DERNIERE_ETAPE && recapitulatif && (
+          <div className="etape-entree mt-6 flex flex-col gap-6">
+            <p className="text-sm text-muted">
+              Vérifiez vos informations avant de soumettre le dossier.
+            </p>
+            {recapitulatif.map((lignes, index) => (
+              <section key={ETAPES[index].titre}>
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className="font-display text-base font-semibold text-ink">
+                    {ETAPES[index].titre}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => revenirALEtape(index)}
+                    className={CLASSE_LIEN}
+                  >
+                    Modifier
+                    <span className="sr-only"> : {ETAPES[index].titre}</span>
+                  </button>
+                </div>
+                <dl className="mt-2 divide-y divide-line rounded-md border border-line bg-surface text-sm">
+                  {lignes.map(([libelle, valeur]) => (
+                    <div
+                      key={libelle}
+                      className="flex flex-col gap-0.5 px-3.5 py-2.5 sm:flex-row sm:gap-4"
+                    >
+                      <dt className="text-muted sm:w-44 sm:shrink-0">
+                        {libelle}
+                      </dt>
+                      <dd className="font-medium break-words whitespace-pre-line text-ink">
+                        {valeur}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ))}
+          </div>
+        )}
+
+        {/* Toujours monté pour que l'annonce soit lue quand le message apparaît. */}
+        <div role="status" className="mt-6">
+          {dossierPret && (
+            <p className="apparition flex items-center gap-3 rounded-md border border-green-700/40 bg-green-700/10 px-3.5 py-3 text-sm font-semibold text-green-800 dark:text-green-300">
+              <span
+                aria-hidden="true"
+                className="flex size-7 shrink-0 items-center justify-center rounded-full bg-green-700 text-white"
+              >
+                <Coche className="coche-tracee size-4" />
+              </span>
+              Dossier prêt (envoi non branché)
+            </p>
+          )}
+        </div>
+
+        <div className="mt-8 flex items-center justify-between gap-4 border-t border-line pt-6">
+          {etape > 0 ? (
+            <button
+              type="button"
+              onClick={() => revenirALEtape(etape - 1)}
+              className={CLASSE_BOUTON_SECONDAIRE}
+            >
+              Précédent
+            </button>
+          ) : (
+            <span />
           )}
 
-          {/* Toujours monté pour que l'annonce soit lue quand le message apparaît. */}
-          <div role="status" className="mt-6">
-            {dossierPret && (
-              <p className="rounded-md border border-green-700/40 bg-green-700/10 px-3.5 py-2.5 text-sm font-medium text-green-800 dark:text-green-300">
-                Dossier prêt (envoi non branché)
-              </p>
-            )}
-          </div>
-
-          <div className="mt-8 flex items-center justify-between gap-4 border-t border-line pt-6">
-            {etape > 0 ? (
-              <button
-                type="button"
-                onClick={allerALEtapePrecedente}
-                className={CLASSE_BOUTON_SECONDAIRE}
-              >
-                Précédent
-              </button>
-            ) : (
-              <span />
-            )}
-
-            <button
-              type="submit"
-              className={CLASSE_BOUTON_PRINCIPAL}
-            >
-              {etape < DERNIERE_ETAPE ? "Suivant" : "Soumettre le dossier"}
-            </button>
-          </div>
-        </form>
+          <button type="submit" className={CLASSE_BOUTON_PRINCIPAL}>
+            {etape < DERNIERE_ETAPE ? "Suivant" : "Soumettre le dossier"}
+          </button>
+        </div>
+      </form>
     </Cadre>
   );
 }

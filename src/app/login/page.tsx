@@ -44,6 +44,7 @@ function messageForStatus(status: number): string {
 
 export default function LoginPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const {
     register,
     handleSubmit,
@@ -88,7 +89,10 @@ export default function LoginPage() {
   }
 
   return (
-    <Cadre texte="Retrouvez votre espace personnel ANANSI EDU.">
+    <Cadre
+      texte="Retrouvez votre espace personnel ANANSI EDU."
+      accroche="Bon retour parmi nous."
+    >
       <div className="lg:flex lg:min-h-[calc(100vh-8rem)] lg:flex-col lg:justify-center">
         <h1 className={CLASSE_TITRE}>Connexion</h1>
         <p className="mt-3 text-base text-muted">
@@ -124,15 +128,29 @@ export default function LoginPage() {
             <label htmlFor="password" className={CLASSE_LIBELLE}>
               Mot de passe
             </label>
-            <input
-              id="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={errors.password ? true : undefined}
-              aria-describedby={errors.password ? "password-error" : undefined}
-              className={CLASSE_CHAMP}
-              {...register("password")}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={isPasswordVisible ? "text" : "password"}
+                autoComplete="current-password"
+                aria-invalid={errors.password ? true : undefined}
+                aria-describedby={
+                  errors.password ? "password-error" : undefined
+                }
+                className={`${CLASSE_CHAMP} w-full pr-24`}
+                {...register("password")}
+              />
+              <button
+                type="button"
+                aria-pressed={isPasswordVisible}
+                aria-controls="password"
+                onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+                className="absolute inset-y-1 right-1 rounded px-3 text-sm font-semibold text-muted transition-colors hover:bg-ink/5 hover:text-ink focus-visible:outline-2 focus-visible:outline-ink"
+              >
+                {isPasswordVisible ? "Masquer" : "Afficher"}
+                <span className="sr-only"> le mot de passe</span>
+              </button>
+            </div>
             {errors.password && (
               <p id="password-error" role="alert" className={CLASSE_ERREUR}>
                 {errors.password.message}
@@ -143,7 +161,7 @@ export default function LoginPage() {
           {errors.root?.server && (
             <p
               role="alert"
-              className="rounded-md border border-red-600/40 bg-red-600/10 px-3.5 py-2.5 text-sm text-red-800 dark:text-red-300"
+              className="apparition rounded-md border border-red-600/40 bg-red-600/10 px-3.5 py-2.5 text-sm text-red-800 dark:text-red-300"
             >
               {errors.root.server.message}
             </p>
@@ -152,7 +170,7 @@ export default function LoginPage() {
           {isLoggedIn && (
             <p
               role="status"
-              className="rounded-md border border-green-700/40 bg-green-700/10 px-3.5 py-2.5 text-sm font-medium text-green-800 dark:text-green-300"
+              className="apparition rounded-md border border-green-700/40 bg-green-700/10 px-3.5 py-2.5 text-sm font-medium text-green-800 dark:text-green-300"
             >
               Connexion réussie.
             </p>
@@ -163,6 +181,12 @@ export default function LoginPage() {
             disabled={isSubmitting}
             className={`${CLASSE_BOUTON_PRINCIPAL} mt-1 self-start`}
           >
+            {isSubmitting && (
+              <span
+                aria-hidden="true"
+                className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:animate-none"
+              />
+            )}
             {isSubmitting ? "Connexion en cours…" : "Se connecter"}
           </button>
         </form>
