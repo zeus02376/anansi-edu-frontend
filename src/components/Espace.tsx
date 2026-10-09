@@ -47,7 +47,7 @@ function Interface({ children }: { children: ReactNode }) {
   if (!role) return null;
 
   return (
-    <div className="flex flex-1 lg:h-screen lg:overflow-hidden">
+    <div className="flex flex-1 lg:h-screen lg:overflow-hidden print:block print:h-auto print:overflow-visible">
       <Sidebar
         role={role}
         ouvert={menuOuvert}
@@ -55,7 +55,7 @@ function Interface({ children }: { children: ReactNode }) {
       />
       <div
         ref={contenu}
-        className="flex min-w-0 flex-1 flex-col bg-wash lg:overflow-y-auto"
+        className="flex min-w-0 flex-1 flex-col bg-wash lg:overflow-y-auto print:block print:overflow-visible print:bg-white"
       >
         <Navbar
           menuOuvert={menuOuvert}

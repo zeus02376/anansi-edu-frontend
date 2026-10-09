@@ -29,10 +29,23 @@ const NAVIGATION: Record<Role, Groupe[]> = {
   ],
   SCOLARITE: [{ liens: LIENS_SCOLARITE }],
   ENSEIGNANT: [
-    { liens: [{ href: "/enseignant/dashboard", libelle: "Tableau de bord" }] },
+    {
+      liens: [
+        { href: "/enseignant/dashboard", libelle: "Tableau de bord" },
+        { href: "/enseignant/matieres", libelle: "Mes matières" },
+        { href: "/enseignant/profil", libelle: "Mon profil" },
+      ],
+    },
   ],
   ETUDIANT: [
-    { liens: [{ href: "/etudiant/dashboard", libelle: "Tableau de bord" }] },
+    {
+      liens: [
+        { href: "/etudiant/dashboard", libelle: "Tableau de bord" },
+        { href: "/etudiant/dossier", libelle: "Mon dossier" },
+        { href: "/etudiant/inscriptions", libelle: "Mes inscriptions" },
+        { href: "/etudiant/matieres", libelle: "Mes matières" },
+      ],
+    },
   ],
 };
 
@@ -53,13 +66,13 @@ export function Sidebar({
       <div
         aria-hidden="true"
         onClick={onFermer}
-        className={`fixed inset-0 z-30 bg-ink/40 transition-opacity duration-200 lg:hidden ${
+        className={`fixed inset-0 z-30 print:hidden bg-ink/40 transition-opacity duration-200 lg:hidden ${
           ouvert ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
       <aside
         id="menu-principal"
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-panel text-white transition-transform duration-200 motion-reduce:transition-none lg:static lg:z-auto lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 print:hidden flex-col bg-panel text-white transition-transform duration-200 motion-reduce:transition-none lg:static lg:z-auto lg:translate-x-0 ${
           ouvert ? "translate-x-0" : "invisible -translate-x-full lg:visible"
         }`}
       >

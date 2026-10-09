@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import {
   compterParStatut,
   nomCandidat,
   useCandidatures,
 } from "@/components/candidatures/useCandidatures";
+import { useEcranLarge } from "@/hooks/useEcranLarge";
 import {
   CLASSE_BOUTON_PRINCIPAL,
   CLASSE_CHAMP,
@@ -46,20 +47,6 @@ const LIBELLE_CYCLE: Record<string, string> = {
 function cycleDeLaFiliere(candidature: Candidature): string | null {
   const cycle = candidature.filiere?.cycle;
   return cycle ? (LIBELLE_CYCLE[cycle] ?? cycle) : null;
-}
-
-// Tableau à partir de 768 px, cartes en dessous. Un seul des deux est
-// affiché à la fois : les champs de statut ne sont jamais en double.
-function useEcranLarge(): boolean {
-  return useSyncExternalStore(
-    (notifier) => {
-      const requete = window.matchMedia("(min-width: 48rem)");
-      requete.addEventListener("change", notifier);
-      return () => requete.removeEventListener("change", notifier);
-    },
-    () => window.matchMedia("(min-width: 48rem)").matches,
-    () => true,
-  );
 }
 
 const CLASSE_FILTRE =

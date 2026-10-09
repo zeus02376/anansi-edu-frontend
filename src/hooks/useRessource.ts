@@ -3,21 +3,21 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, messageErreurApi } from "@/services/api";
 
-type EtatRessource<T> = {
+type Reponse<T> = {
+  chemin: string;
+  version: number;
   donnees: T | null;
   erreur: string | null;
-  chargement: boolean;
 };
 
 // Charge une ressource du backend (GET) et expose l'état d'affichage :
 // données, message d'erreur en français, chargement, et de quoi recharger.
-// Passer `null` comme chemin met le chargement en attente.
+// Passer `null` comme chemin met le chargement en attente : on peut ainsi
+// enchaîner deux appels, le second dépendant du premier. Le chargement se
+// déduit de la dernière réponse reçue (celle de ce chemin et de cette
+// version) : il n'y a donc pas d'instant où l'on croirait la liste vide.
 export function useRessource<T>(chemin: string | null) {
-  const [etat, setEtat] = useState<EtatRessource<T>>({
-    donnees: null,
-    erreur: null,
-    chargement: chemin !== null,
-  });
+  const [reponse, setReponse] = useState<Reponse<T> | null>(null);
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
@@ -26,30 +26,44 @@ export function useRessource<T>(chemin: string | null) {
     const annulation = new AbortController();
     api
       .get<T>(chemin, { signal: annulation.signal })
-      .then((reponse) => {
-        setEtat({ donnees: reponse.data, erreur: null, chargement: false });
+      .then(({ data }) => {
+        setReponse({ chemin, version, donnees: data, erreur: null });
       })
       .catch((erreur: unknown) => {
         if (annulation.signal.aborted) return;
-        setEtat({
+        setReponse({
+          chemin,
+          version,
           donnees: null,
-          erreur: messageErreurApi(erreur),
-          chargement: false,
+          erreur: messageErreurApi(erreur, { messageServeur: false }),
         });
       });
 
     return () => annulation.abort();
   }, [chemin, version]);
 
+  const memeChemin = reponse !== null && reponse.chemin === chemin;
+  const aJour = memeChemin && reponse.version === version;
+
   const recharger = useCallback(() => {
-    setEtat((precedent) => ({ ...precedent, erreur: null, chargement: true }));
     setVersion((precedente) => precedente + 1);
   }, []);
 
   // Met à jour les données affichées sans refaire d'appel (après un PATCH).
-  const remplacer = useCallback((donnees: T) => {
-    setEtat({ donnees, erreur: null, chargement: false });
-  }, []);
+  const remplacer = useCallback(
+    (donnees: T) => {
+      if (chemin === null) return;
+      setReponse({ chemin, version, donnees, erreur: null });
+    },
+    [chemin, version],
+  );
 
-  return { ...etat, recharger, remplacer };
+  return {
+    // Pendant un rechargement, on garde les données déjà affichées.
+    donnees: memeChemin ? reponse.donnees : null,
+    erreur: aJour ? reponse.erreur : null,
+    chargement: chemin !== null && !aJour,
+    recharger,
+    remplacer,
+  };
 }

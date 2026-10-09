@@ -27,7 +27,7 @@ export function Navbar({
   const nom = [user?.prenom, user?.nom].filter(Boolean).join(" ");
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-line bg-surface px-4 sm:px-6">
+    <header className="sticky top-0 z-20 print:hidden flex h-16 shrink-0 items-center gap-3 border-b border-line bg-surface px-4 sm:px-6">
       <button
         type="button"
         onClick={onBasculerMenu}

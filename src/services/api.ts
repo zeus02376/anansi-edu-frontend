@@ -53,7 +53,15 @@ function messageDuBackend(donnees: unknown): string | null {
 }
 
 // Traduit n'importe quel échec d'appel en une phrase lisible.
-export function messageErreurApi(erreur: unknown): string {
+// `messageServeur: false` ignore le texte envoyé par le backend (qui peut
+// être en anglais ou citer des identifiants) : à utiliser pour afficher le
+// résultat d'une simple lecture.
+export function messageErreurApi(
+  erreur: unknown,
+  { messageServeur = true }: { messageServeur?: boolean } = {},
+): string {
+  const lire = (donnees: unknown) =>
+    messageServeur ? messageDuBackend(donnees) : null;
   if (!axios.isAxiosError(erreur)) {
     return "Une erreur inattendue s'est produite. Réessayez.";
   }
@@ -69,17 +77,17 @@ export function messageErreurApi(erreur: unknown): string {
     return MESSAGE_ACCES_REFUSE;
   }
   if (status === 404) {
-    return messageDuBackend(data) ?? "L'élément demandé est introuvable.";
+    return lire(data) ?? "L'élément demandé est introuvable.";
   }
   if (status === 409) {
     return (
-      messageDuBackend(data) ??
+      lire(data) ??
       "Cette action entre en conflit avec des données existantes."
     );
   }
   if (status === 400) {
     return (
-      messageDuBackend(data) ??
+      lire(data) ??
       "Les informations envoyées ne sont pas valides. Vérifiez les champs."
     );
   }
