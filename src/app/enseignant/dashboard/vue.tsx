@@ -1,216 +1,159 @@
 "use client";
 
+import Link from "next/link";
 import {
-  Carte,
-  Chargement,
-  CLASSE_TABLEAU,
-  CLASSE_TABLEAU_DEFILANT,
-  CLASSE_TD,
-  CLASSE_TH,
-  EnTete,
-  Erreur,
-  Vide,
-} from "@/components/ui";
-import { useRessource } from "@/hooks/useRessource";
-import { MESSAGE_ACCES_REFUSE } from "@/services/api";
+  anneeEnCours,
+  ChipAvancement,
+  EtatEnseignant,
+  heuresRestantes,
+  totaux,
+} from "@/components/enseignant/outils";
+import { Inclinable } from "@/components/Inclinable";
+import { Nombre } from "@/components/Nombre";
+import { Progression } from "@/components/Progression";
+import { CLASSE_LIEN } from "@/components/styles";
+import { Carte, EnTete, Vide } from "@/components/ui";
+import { useEnseignantConnecte } from "@/hooks/useEnseignantConnecte";
 import { useAuthStore } from "@/stores/authStore";
-import type { Affectation, Enseignant } from "@/types";
+import type { Affectation } from "@/types";
 
-const LIBELLE_TYPE: Record<Enseignant["type"], string> = {
-  PERMANENT: "Permanent",
-  VACATAIRE: "Vacataire",
-};
-
-// Le backend réserve aujourd'hui /enseignants aux profils administration et
-// scolarité : un enseignant reçoit un 403 en demandant ses propres données.
-function AvisAccesLimite() {
-  return (
-    <div
-      role="status"
-      className="m-5 rounded-md border border-primary/30 bg-primary/5 px-4 py-3 text-sm text-ink"
-    >
-      <p className="font-semibold">
-        Vos enseignements ne sont pas encore consultables ici.
-      </p>
-      <p className="mt-1 text-muted">
-        Le serveur n&apos;autorise pas encore le profil enseignant à lire ses
-        propres matières et affectations. En attendant, le service de scolarité
-        de votre établissement peut vous les communiquer.
-      </p>
-    </div>
-  );
-}
-
-function Echec({
-  message,
-  onReessayer,
+function Chiffre({
+  libelle,
+  valeur,
+  unite,
 }: {
-  message: string;
-  onReessayer: () => void;
+  libelle: string;
+  valeur: number;
+  unite?: string;
 }) {
-  if (message === MESSAGE_ACCES_REFUSE) return <AvisAccesLimite />;
   return (
-    <div className="p-5">
-      <Erreur message={message} onReessayer={onReessayer} />
-    </div>
+    <Inclinable className="h-full rounded-xl border border-line bg-surface p-5 shadow-[0_1px_2px_rgb(15_23_42/0.04),0_14px_32px_-18px_rgb(15_23_42/0.14)]">
+      <p className="text-sm font-semibold text-muted">{libelle}</p>
+      <p className="mt-2 font-display text-3xl font-semibold text-primary tabular-nums">
+        <Nombre valeur={valeur} />
+        {unite && <span className="ml-1 text-lg text-muted">{unite}</span>}
+      </p>
+    </Inclinable>
   );
 }
 
-function TableauAffectations({ affectations }: { affectations: Affectation[] }) {
-  const total = affectations.reduce(
-    (somme, affectation) => ({
-      credits: somme.credits + (affectation.matiere?.credits ?? 0),
-      prevues: somme.prevues + affectation.heuresPrevues,
-      effectuees: somme.effectuees + affectation.heuresEffectuees,
-    }),
-    { credits: 0, prevues: 0, effectuees: 0 },
-  );
+function Contenu({ affectations }: { affectations: Affectation[] }) {
+  const total = totaux(affectations);
+  const annee = anneeEnCours(affectations);
+  const lignes = annee
+    ? affectations.filter((a) => a.anneeAcademiqueId === annee.id)
+    : affectations;
+  const restantes = lignes
+    .filter((a) => heuresRestantes(a) > 0)
+    .sort((a, b) => heuresRestantes(b) - heuresRestantes(a));
 
   return (
-    <div className={CLASSE_TABLEAU_DEFILANT}>
-      <table className={CLASSE_TABLEAU}>
-        <caption className="sr-only">Mes matières et affectations</caption>
-        <thead>
-          <tr>
-            <th scope="col" className={CLASSE_TH}>
-              Matière
-            </th>
-            <th scope="col" className={CLASSE_TH}>
-              Année académique
-            </th>
-            <th scope="col" className={`${CLASSE_TH} text-right`}>
-              Crédits
-            </th>
-            <th scope="col" className={`${CLASSE_TH} text-right`}>
-              Heures prévues
-            </th>
-            <th scope="col" className={`${CLASSE_TH} text-right`}>
-              Heures effectuées
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {affectations.map((affectation) => (
-            <tr key={affectation.id}>
-              <td className={CLASSE_TD}>
-                <span className="font-semibold">
-                  {affectation.matiere?.nom ?? "Matière inconnue"}
+    <>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Chiffre libelle="Matières enseignées" valeur={total.matieres} />
+        <Chiffre libelle="Heures prévues" valeur={total.prevues} unite="h" />
+        <Chiffre libelle="Heures effectuées" valeur={total.effectuees} unite="h" />
+        <Chiffre libelle="Avancement global" valeur={total.avancement} unite="%" />
+      </div>
+
+      <Carte className="mt-6">
+        <div className="border-b border-line px-5 py-4">
+          <h2 className="font-display text-lg font-semibold text-ink">
+            Année en cours
+          </h2>
+          {annee && <p className="text-sm text-muted">{annee.libelle}</p>}
+        </div>
+        <ul className="divide-y divide-line">
+          {lignes.map((a) => {
+            const nom = a.matiere?.nom ?? "Matière inconnue";
+            return (
+              <li key={a.id} className="px-5 py-4">
+                <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-ink">{nom}</p>
+                    {a.matiere && (
+                      <p className="font-mono text-xs text-muted">
+                        {a.matiere.code}
+                      </p>
+                    )}
+                  </div>
+                  <ChipAvancement affectation={a} />
+                </div>
+                <p className="mt-2 text-sm text-muted tabular-nums">
+                  {a.heuresEffectuees} h sur {a.heuresPrevues} h
+                </p>
+                <Progression
+                  className="mt-1.5"
+                  valeur={a.heuresEffectuees}
+                  max={a.heuresPrevues}
+                  libelle={`Heures effectuées de ${nom}`}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      </Carte>
+
+      <Carte className="mt-6">
+        <h2 className="border-b border-line px-5 py-4 font-display text-lg font-semibold text-ink">
+          Heures restantes à assurer
+        </h2>
+        {restantes.length === 0 ? (
+          <Vide>Toutes les heures prévues sont assurées.</Vide>
+        ) : (
+          <ul className="divide-y divide-line">
+            {restantes.map((a) => (
+              <li
+                key={a.id}
+                className="flex items-baseline justify-between gap-4 px-5 py-3 text-sm"
+              >
+                <span className="min-w-0 font-semibold text-ink">
+                  {a.matiere?.nom ?? "Matière inconnue"}
                 </span>
-                {affectation.matiere && (
-                  <span className="block font-mono text-xs text-muted">
-                    {affectation.matiere.code}
-                  </span>
-                )}
-              </td>
-              <td className={`${CLASSE_TD} whitespace-nowrap`}>
-                {affectation.anneeAcademique?.libelle ?? "—"}
-              </td>
-              <td className={`${CLASSE_TD} text-right tabular-nums`}>
-                {affectation.matiere?.credits ?? "—"}
-              </td>
-              <td className={`${CLASSE_TD} text-right tabular-nums`}>
-                {affectation.heuresPrevues} h
-              </td>
-              <td className={`${CLASSE_TD} text-right tabular-nums`}>
-                {affectation.heuresEffectuees} h
-              </td>
-            </tr>
-          ))}
-        </tbody>
-        <tfoot>
-          <tr className="font-semibold">
-            <th scope="row" colSpan={2} className="px-5 py-3 text-left text-ink">
-              Total ({affectations.length} affectation
-              {affectations.length > 1 ? "s" : ""})
-            </th>
-            <td className="px-5 py-3 text-right text-ink tabular-nums">
-              {total.credits}
-            </td>
-            <td className="px-5 py-3 text-right text-ink tabular-nums">
-              {total.prevues} h
-            </td>
-            <td className="px-5 py-3 text-right text-ink tabular-nums">
-              {total.effectuees} h
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+                <span className="whitespace-nowrap text-muted tabular-nums">
+                  {heuresRestantes(a)} h restantes
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Carte>
+
+      <p className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+        <Link href="/enseignant/matieres" className={CLASSE_LIEN}>
+          Voir toutes mes matières
+        </Link>
+        <Link href="/enseignant/profil" className={CLASSE_LIEN}>
+          Voir mon profil
+        </Link>
+      </p>
+    </>
   );
 }
 
 export default function EnseignantDashboardPage() {
-  const user = useAuthStore((etat) => etat.user);
-  const enseignants = useRessource<Enseignant[]>("/enseignants");
-  const enseignant =
-    enseignants.donnees?.find((candidat) => candidat.userId === user?.id) ??
-    null;
-  // Second appel en attente tant que la fiche enseignant n'est pas connue.
-  const affectations = useRessource<Affectation[]>(
-    enseignant ? `/enseignants/${enseignant.id}/affectations` : null,
-  );
-
-  const prenom = user?.prenom ?? enseignant?.user?.prenom;
-
-  function contenu() {
-    if (enseignants.chargement) {
-      return <Chargement texte="Chargement de vos enseignements…" />;
-    }
-    if (enseignants.erreur) {
-      return (
-        <Echec message={enseignants.erreur} onReessayer={enseignants.recharger} />
-      );
-    }
-    if (!enseignant) {
-      return (
-        <Vide>
-          Aucune fiche enseignant n&apos;est rattachée à votre compte. Le
-          service de scolarité peut la créer.
-        </Vide>
-      );
-    }
-    if (affectations.erreur) {
-      return (
-        <Echec
-          message={affectations.erreur}
-          onReessayer={affectations.recharger}
-        />
-      );
-    }
-    if (!affectations.donnees) {
-      return <Chargement texte="Chargement de vos affectations…" />;
-    }
-    if (affectations.donnees.length === 0) {
-      return <Vide>Aucune matière ne vous est affectée pour le moment.</Vide>;
-    }
-    return <TableauAffectations affectations={affectations.donnees} />;
-  }
+  const prenom = useAuthStore((etat) => etat.user?.prenom);
+  const etat = useEnseignantConnecte();
 
   return (
     <div>
       <EnTete
-        titre="Tableau de bord"
-        texte={
-          prenom
-            ? `Bonjour ${prenom}, voici vos matières et vos heures d'enseignement.`
-            : "Vos matières et vos heures d'enseignement."
-        }
+        titre={prenom ? `Bonjour ${prenom}` : "Tableau de bord"}
+        texte="Vos matières et l'avancement de vos heures d'enseignement."
       />
-
-      <Carte className="mt-6">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b border-line px-5 py-4">
-          <h2 className="font-display text-lg font-semibold text-ink">
-            Mes matières et affectations
-          </h2>
-          {enseignant && (
-            <p className="text-sm text-muted">
-              {LIBELLE_TYPE[enseignant.type] ?? enseignant.type}
-              {enseignant.specialite && ` · ${enseignant.specialite}`}
-            </p>
-          )}
-        </div>
-        {contenu()}
-      </Carte>
+      <div className="mt-6">
+        <EtatEnseignant etat={etat} sujet="Vos enseignements">
+          {(_enseignant, affectations) =>
+            affectations.length === 0 ? (
+              <Carte>
+                <Vide>Aucune matière ne vous est affectée pour le moment.</Vide>
+              </Carte>
+            ) : (
+              <Contenu affectations={affectations} />
+            )
+          }
+        </EtatEnseignant>
+      </div>
     </div>
   );
 }
