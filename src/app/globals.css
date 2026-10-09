@@ -1,26 +1,73 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --paper: #f6f7fb;
+  --surface: #ffffff;
+  --ink: #14162e;
+  --muted: #565b7a;
+  --line: #d5d8e6;
+  --field: #7f84a6;
+  --panel: #1b1f4b;
+  --gold: #e0a526;
+  --primary: #1b1f4b;
+  --on-primary: #f6f7fb;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-field: var(--field);
+  --color-panel: var(--panel);
+  --color-gold: var(--gold);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --font-sans: var(--font-instrument-sans);
+  --font-display: var(--font-bricolage);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #0e1026;
+    --surface: #161935;
+    --ink: #ecedf7;
+    --muted: #a3a8c7;
+    --line: #2c3058;
+    --field: #6a6fa0;
+    --panel: #171a40;
+    --primary: #e0a526;
+    --on-primary: #14162e;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-instrument-sans), system-ui, sans-serif;
+}
+
+/* Le fil d'or qui relie les étapes : horizontal sur mobile, vertical sur
+   grand écran. --avancement va de 0 (première étape) à 1 (dernière). */
+.fil-avancement {
+  transform: scaleX(var(--avancement, 0));
+  transform-origin: left;
+  transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 64rem) {
+  .fil-avancement {
+    transform: scaleY(var(--avancement, 0));
+    transform-origin: top;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fil-avancement {
+    transition: none;
+  }
 }
