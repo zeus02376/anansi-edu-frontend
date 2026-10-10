@@ -117,7 +117,7 @@ function Candidatures() {
   const [rowLoading, setRowLoading] = useState({})
   const [rowMessages, setRowMessages] = useState({})
   const [createdStudents, setCreatedStudents] = useState({})
-  const [successMessage, setSuccessMessage] = useState('')
+  const [createdAccount, setCreatedAccount] = useState(null)
   const [options, setOptions] = useState({ filieres: [], annees: [] })
   const [optionsLoading, setOptionsLoading] = useState(false)
 
@@ -260,11 +260,16 @@ function Candidatures() {
         candidatureId: candidature.id,
         tenantId: user.tenantId,
       })
-      setCreatedStudents((current) => ({ ...current, [candidature.id]: data }))
-      setStudents((current) => [...current, data])
-      setSuccessMessage(
-        `Étudiant créé avec le matricule ${data.matricule} (${candidature.prenom} ${candidature.nom})`,
-      )
+      // Le mot de passe temporaire n'est gardé que dans l'alerte, pas dans les listes
+      const { motDePasseTemporaire, ...student } = data
+      setCreatedStudents((current) => ({ ...current, [candidature.id]: student }))
+      setStudents((current) => [...current, student])
+      setCreatedAccount({
+        matricule: student.matricule,
+        nomComplet: `${candidature.prenom} ${candidature.nom}`,
+        email: candidature.email,
+        motDePasseTemporaire,
+      })
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (requestError) {
       setRowMessages((current) => ({
@@ -390,16 +395,37 @@ function Candidatures() {
         </button>
       </div>
 
-      {successMessage && (
+      {createdAccount && (
         <div
           role="status"
-          className="mb-5 flex items-start justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"
+          className="mb-5 flex items-start justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
         >
-          <span>{successMessage}</span>
+          <div className="min-w-0 space-y-2">
+            <p className="font-semibold">
+              Étudiant créé avec le matricule {createdAccount.matricule} (
+              {createdAccount.nomComplet})
+            </p>
+            {createdAccount.motDePasseTemporaire && (
+              <>
+                <p>
+                  Identifiant : <span className="font-semibold">{createdAccount.email}</span>
+                  <br />
+                  Mot de passe temporaire :{' '}
+                  <code className="select-all rounded-md bg-white px-2 py-0.5 font-mono text-base font-bold tracking-wider text-iuc-blue ring-1 ring-emerald-200">
+                    {createdAccount.motDePasseTemporaire}
+                  </code>
+                </p>
+                <p className="rounded-lg bg-amber-50 px-3 py-2 font-semibold text-amber-800 ring-1 ring-amber-200">
+                  ⚠ À noter maintenant : ce mot de passe ne sera plus jamais affiché.
+                  L’étudiant devra le changer à sa première connexion.
+                </p>
+              </>
+            )}
+          </div>
           <button
             aria-label="Fermer le message"
             className="shrink-0 rounded-lg px-2 text-lg leading-none text-emerald-600 hover:bg-emerald-100"
-            onClick={() => setSuccessMessage('')}
+            onClick={() => setCreatedAccount(null)}
             type="button"
           >
             ×

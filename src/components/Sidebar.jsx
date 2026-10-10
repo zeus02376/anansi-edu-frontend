@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import { useAuthStore } from '../stores/authStore'
+import { CHANGE_PASSWORD_PATH } from '../utils/dashboard'
 
 const navigationByRole = {
   ADMIN: [
@@ -26,6 +27,7 @@ const navigationByRole = {
   ETUDIANT: [
     { label: 'Tableau de bord', to: '/etudiant', icon: '⌂' },
     { label: 'Mon dossier', to: '/etudiant/dossier', icon: '▣' },
+    { label: 'Changer mon mot de passe', to: CHANGE_PASSWORD_PATH, icon: '⚿' },
   ],
 }
 

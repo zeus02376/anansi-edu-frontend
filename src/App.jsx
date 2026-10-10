@@ -3,12 +3,14 @@ import PropTypes from 'prop-types'
 import DashboardLayout from './components/DashboardLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/auth/Login'
+import ChangerMotDePasse from './pages/auth/ChangerMotDePasse'
 import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
 import Candidatures from './pages/scolarite/Candidatures'
 import ScolariteDashboard from './pages/scolarite/Dashboard'
 import EnseignantDashboard from './pages/enseignant/Dashboard'
 import EtudiantDashboard from './pages/etudiant/Dashboard'
+import { CHANGE_PASSWORD_PATH } from './utils/dashboard'
 
 function ModulePlaceholder({ title }) {
   return (
@@ -76,6 +78,13 @@ function App() {
         <Route
           path="/etudiant/dossier"
           element={<ModulePlaceholder title="Mon dossier" />}
+        />
+      </Route>
+
+      <Route element={<ProtectedRoute />}>
+        <Route
+          path={CHANGE_PASSWORD_PATH}
+          element={<ChangerMotDePasse />}
         />
       </Route>
 

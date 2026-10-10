@@ -60,5 +60,14 @@ export const useAuthStore = create((set) => ({
     set({ user: null, token: null, isAuthenticated: false, error: null })
   },
 
+  changePassword: async (motDePasseActuel, nouveauMotDePasse) => {
+    await api.patch('/auth/change-password', { motDePasseActuel, nouveauMotDePasse })
+    set((state) => {
+      const user = { ...state.user, doitChangerMotDePasse: false }
+      localStorage.setItem('anansi-user', JSON.stringify(user))
+      return { user }
+    })
+  },
+
   clearError: () => set({ error: null }),
 }))
