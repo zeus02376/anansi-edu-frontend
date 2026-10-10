@@ -9,8 +9,7 @@ type Lien = { href: string; libelle: string };
 type Groupe = { titre?: string; liens: Lien[] };
 
 const LIENS_SCOLARITE: Lien[] = [
-  { href: "/scolarite/dashboard", libelle: "Tableau de bord" },
-  { href: "/scolarite/candidatures", libelle: "Candidatures" },
+  { href: "/scolarite", libelle: "Tableau de bord" },
   { href: "/scolarite/etudiants", libelle: "Étudiants" },
 ];
 
@@ -39,6 +38,14 @@ const NAVIGATION: Record<Role, Groupe[]> = {
   ],
   ETUDIANT: [
     {
+      titre: "Candidature",
+      liens: [
+        { href: "/candidature", libelle: "Nouvelle candidature" },
+        { href: "/suivi", libelle: "Suivi" },
+      ],
+    },
+    {
+      titre: "Mon espace",
       liens: [
         { href: "/etudiant/dashboard", libelle: "Tableau de bord" },
         { href: "/etudiant/dossier", libelle: "Mon dossier" },
@@ -93,7 +100,11 @@ export function Sidebar({
               )}
               <ul className="flex flex-col gap-1">
                 {groupe.liens.map(({ href, libelle }) => {
-                  const actif = chemin === href;
+                  // Le tableau de bord de la scolarité reste actif sur le détail d'un dossier.
+                  const actif =
+                    chemin === href ||
+                    (href === "/scolarite" &&
+                      chemin.startsWith("/scolarite/dossiers/"));
                   return (
                     <li key={href}>
                       <Link
