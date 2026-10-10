@@ -11,7 +11,7 @@ const readStoredUser = () => {
   }
 }
 
-const storedToken = localStorage.getItem('anansi-token')
+const storedToken = localStorage.getItem('token') || localStorage.getItem('anansi-token')
 
 export const useAuthStore = create((set) => ({
   user: storedToken ? readStoredUser() : null,
@@ -35,6 +35,7 @@ export const useAuthStore = create((set) => ({
       }
 
       localStorage.setItem('anansi-token', token)
+      localStorage.setItem('token', token)
       localStorage.setItem('anansi-user', JSON.stringify(data.user))
       set({ user: data.user, token, isAuthenticated: true, isLoading: false })
 
@@ -54,6 +55,7 @@ export const useAuthStore = create((set) => ({
 
   logout: () => {
     localStorage.removeItem('anansi-token')
+    localStorage.removeItem('token')
     localStorage.removeItem('anansi-user')
     set({ user: null, token: null, isAuthenticated: false, error: null })
   },
