@@ -3,19 +3,10 @@
 import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
 
-// Relit le jeton enregistré dans le navigateur, une fois la page affichée.
+// Au démarrage de l'application, demande au serveur qui est connecté.
 export function AuthHydration() {
   useEffect(() => {
-    // Si le navigateur bloque localStorage, Zustand n'expose pas `persist` :
-    // on continue avec une session gardée seulement en mémoire.
-    const persistance = useAuthStore.persist as
-      | typeof useAuthStore.persist
-      | undefined;
-    if (persistance) {
-      void persistance.rehydrate();
-    } else {
-      useAuthStore.setState({ estPret: true });
-    }
+    void useAuthStore.getState().chargerSession();
   }, []);
 
   return null;

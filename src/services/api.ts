@@ -1,36 +1,20 @@
 import axios from "axios";
-import { useAuthStore } from "@/stores/authStore";
+import { terminerSession } from "@/stores/authStore";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, ""),
   timeout: 10_000,
+  // La session est un cookie posé par le backend, pas un jeton en JavaScript.
+  withCredentials: true,
 });
 
-// Chaque requête part avec le jeton de la personne connectée.
-api.interceptors.request.use((config) => {
-  const { token } = useAuthStore.getState();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-// Un 401 veut dire que le jeton n'est plus accepté (expiré, compte
+// Un 401 veut dire que la session n'est plus acceptée (expirée, compte
 // désactivé) : on déconnecte et on renvoie vers la page de connexion.
 api.interceptors.response.use(
   (reponse) => reponse,
   (erreur: unknown) => {
     if (axios.isAxiosError(erreur) && erreur.response?.status === 401) {
-      useAuthStore.getState().logout();
-      if (
-        typeof window !== "undefined" &&
-        window.location.pathname !== "/login"
-      ) {
-        // Hors d'un composant React, il n'y a pas de routeur : on recharge
-        // la page, ce qui vide aussi tout ce qui était affiché.
-        // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-        window.location.assign("/login?session=expiree");
-      }
+      terminerSession();
     }
     return Promise.reject(erreur);
   },

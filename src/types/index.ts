@@ -1,8 +1,6 @@
 // Formes des données renvoyées par le backend ANANSI (schéma Prisma).
 // Les dates arrivent sous forme de chaînes ISO.
 
-import type { Role } from "@/lib/roles";
-
 export const STATUTS_CANDIDATURE = [
   "SOUMIS",
   "INCOMPLET",
@@ -14,21 +12,8 @@ export type StatutCandidature = (typeof STATUTS_CANDIDATURE)[number];
 
 export type StatutInscription = "EN_ATTENTE" | "VALIDE" | "REJETE" | "SUSPENDU";
 
-// Après un rechargement de page, seuls id, tenantId et role sont connus :
-// ils sont relus dans le jeton, le reste n'est jamais stocké.
-export type Utilisateur = {
-  id: string;
-  tenantId: string;
-  role: Role;
-  nom?: string;
-  prenom?: string;
-  email?: string;
-};
-
-export type ReponseConnexion = {
-  access_token: string;
-  user: Required<Utilisateur>;
-};
+// La personne connectée vient de GET /auth/me (voir modules/auth).
+export type { Utilisateur } from "@/modules/auth/schemas";
 
 export type Tenant = {
   id: string;

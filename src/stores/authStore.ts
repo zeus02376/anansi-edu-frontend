@@ -1,94 +1,110 @@
-import axios from "axios";
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { lireRole } from "@/lib/roles";
-import type { Role } from "@/lib/roles";
-import type { ReponseConnexion, Utilisateur } from "@/types";
+import { api, ApiError, gererSessionExpiree } from "@/lib/api";
+import { utilisateurSchema } from "@/modules/auth/schemas";
+import type { Utilisateur } from "@/modules/auth/schemas";
 
-const DELAI_CONNEXION_MS = 10_000;
-
-type ChargeDuJeton = { sub: string; tenantId: string; role: Role };
-
-// Lit le contenu du jeton sans le vérifier : la signature est contrôlée par
-// le backend à chaque requête. Ici on s'en sert seulement pour savoir qui
-// est connecté après un rechargement, et pour écarter un jeton expiré.
-function lireJeton(jeton: string): ChargeDuJeton | null {
-  try {
-    const partie = jeton.split(".")[1];
-    const base64 = partie.replace(/-/g, "+").replace(/_/g, "/");
-    const charge: unknown = JSON.parse(
-      atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, "=")),
-    );
-    if (typeof charge !== "object" || charge === null) return null;
-
-    const { sub, tenantId, role, exp } = charge as Record<string, unknown>;
-    if (typeof sub !== "string" || typeof tenantId !== "string") return null;
-    const roleLu = lireRole(role);
-    if (!roleLu) return null;
-    if (typeof exp === "number" && exp * 1000 <= Date.now()) return null;
-
-    return { sub, tenantId, role: roleLu };
-  } catch {
-    return null;
-  }
-}
+// Session de la personne connectée.
+//
+// Le jeton de session est un cookie posé et lu par le backend : il n'est
+// jamais accessible à JavaScript. Le navigateur ne garde que le profil
+// renvoyé par GET /auth/me, en mémoire, et le perd à chaque rechargement
+// (il est relu au démarrage). Rien n'est écrit dans localStorage.
 
 type EtatAuth = {
   user: Utilisateur | null;
-  token: string | null;
   isAuthenticated: boolean;
-  // Vrai une fois le jeton relu dans le navigateur : avant cela on ne sait
-  // pas encore si la personne est connectée.
+  // Vrai une fois la session vérifiée auprès du serveur : avant cela on ne
+  // sait pas encore si la personne est connectée.
   estPret: boolean;
+  // Pourquoi la dernière lecture de la session a échoué, hors « pas connecté ».
+  erreurSession: ApiError | null;
+  chargerSession: () => Promise<void>;
   login: (email: string, password: string) => Promise<Utilisateur>;
-  logout: () => void;
+  logout: () => Promise<void>;
+  viderSession: () => void;
 };
 
-export const useAuthStore = create<EtatAuth>()(
-  persist(
-    (set) => ({
-      user: null,
-      token: null,
-      isAuthenticated: false,
-      estPret: false,
+let chargementEnCours: Promise<void> | null = null;
 
-      // Appel direct, sans passer par l'instance de services/api.ts : cette
-      // requête n'a pas de jeton à envoyer, et un 401 y signifie « mauvais
-      // identifiants », pas « session expirée ».
-      async login(email, password) {
-        const { data } = await axios.post<ReponseConnexion>(
-          `${process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "") ?? ""}/auth/login`,
-          { email, motDePasse: password },
-          { timeout: DELAI_CONNEXION_MS },
-        );
-        set({ user: data.user, token: data.access_token, isAuthenticated: true });
-        return data.user;
-      },
+export const useAuthStore = create<EtatAuth>()((set, get) => ({
+  user: null,
+  isAuthenticated: false,
+  estPret: false,
+  erreurSession: null,
 
-      logout() {
-        set({ user: null, token: null, isAuthenticated: false });
-      },
-    }),
-    {
-      name: "anansi-auth",
-      // Seul le jeton va dans localStorage.
-      partialize: (etat) => ({ token: etat.token }),
-      // La relecture est déclenchée côté navigateur par <AuthHydration />.
-      skipHydration: true,
-      merge: (stocke, etat) => {
-        const jeton = (stocke as { token?: unknown } | undefined)?.token;
-        const charge = typeof jeton === "string" ? lireJeton(jeton) : null;
-        if (typeof jeton !== "string" || !charge) return etat;
-        return {
-          ...etat,
-          token: jeton,
-          user: { id: charge.sub, tenantId: charge.tenantId, role: charge.role },
-          isAuthenticated: true,
-        };
-      },
-      onRehydrateStorage: () => () => {
-        useAuthStore.setState({ estPret: true });
-      },
-    },
-  ),
-);
+  // Relit la session auprès du serveur (GET /auth/me).
+  // TODO backend : GET /auth/me n'existe pas encore.
+  chargerSession() {
+    chargementEnCours ??= (async () => {
+      try {
+        const user = await api.get("/auth/me", {
+          schema: utilisateurSchema,
+          ignorer401: true,
+        });
+        set({ user, isAuthenticated: true, estPret: true, erreurSession: null });
+      } catch (erreur) {
+        // 401 : personne n'est connecté. Toute autre erreur (serveur
+        // injoignable, /auth/me absent) : on ne sait pas, donc on ne
+        // laisse entrer personne.
+        set({
+          user: null,
+          isAuthenticated: false,
+          estPret: true,
+          erreurSession:
+            erreur instanceof ApiError && erreur.nature !== "session" ? erreur : null,
+        });
+      } finally {
+        chargementEnCours = null;
+      }
+    })();
+    return chargementEnCours;
+  },
+
+  // TODO backend : POST /auth/login doit poser le cookie de session (httpOnly)
+  // et accepter { email, motDePasse }.
+  async login(email, motDePasse) {
+    await api.post("/auth/login", {
+      corps: { email, motDePasse },
+      ignorer401: true,
+    });
+    await get().chargerSession();
+
+    const { user, erreurSession } = get();
+    if (user) return user;
+    throw (
+      erreurSession ??
+      new ApiError(
+        "serveur",
+        "La connexion a été acceptée mais le serveur n'a pas ouvert de session. Contactez l'équipe technique.",
+      )
+    );
+  },
+
+  // TODO backend : POST /auth/logout n'est pas spécifié ; il doit effacer le
+  // cookie de session. La session locale est vidée tout de suite.
+  logout() {
+    get().viderSession();
+    return api.post("/auth/logout", { ignorer401: true }).then(
+      () => undefined,
+      () => undefined,
+    );
+  },
+
+  viderSession() {
+    set({ user: null, isAuthenticated: false });
+  },
+}));
+
+// Session refusée par le serveur (401) : on vide l'état et on renvoie vers
+// la page de connexion.
+export function terminerSession() {
+  useAuthStore.getState().viderSession();
+  if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+    // Hors d'un composant React il n'y a pas de routeur : on recharge la page,
+    // ce qui vide aussi tout ce qui était affiché.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign("/login?raison=session");
+  }
+}
+
+gererSessionExpiree(terminerSession);

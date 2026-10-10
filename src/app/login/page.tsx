@@ -4,7 +4,6 @@ import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Cadre } from "@/components/Cadre";
 import { Scene3D } from "@/components/Scene3D";
 import {
@@ -15,34 +14,33 @@ import {
   CLASSE_TITRE,
 } from "@/components/styles";
 import { ACCUEIL_PAR_ROLE } from "@/lib/roles";
-import { messageErreurConnexion } from "@/services/api";
+import { connexionSchema, type ConnexionSaisie } from "@/modules/auth/schemas";
+import { messageErreurConnexion } from "@/modules/auth/erreurs";
 import { useAuthStore } from "@/stores/authStore";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "L'adresse e-mail est obligatoire.")
-    .pipe(z.email("L'adresse e-mail n'est pas valide.")),
-  // Le backend refuse tout mot de passe de moins de 8 caractères.
-  password: z
-    .string()
-    .min(1, "Le mot de passe est obligatoire.")
-    .min(8, "Le mot de passe contient au moins 8 caractères."),
-});
+const loginSchema = connexionSchema;
+type LoginValues = ConnexionSaisie;
 
-type LoginValues = z.infer<typeof loginSchema>;
-
-// Affiché quand services/api.ts a renvoyé ici après un 401.
-function AvisSessionExpiree() {
+// Affiché quand une page protégée a renvoyé ici (session absente ou refusée,
+// serveur injoignable, adresse du serveur non configurée).
+function AvisSession() {
   const parametres = useSearchParams();
-  if (parametres.get("session") !== "expiree") return null;
+  const raison =
+    parametres.get("raison") ??
+    (parametres.get("session") === "expiree" ? "session" : null);
+  const messages: Record<string, string> = {
+    session: "Votre session a expiré ou n'est plus valide. Reconnectez-vous pour continuer.",
+    serveur: "Le serveur est injoignable : votre session n'a pas pu être vérifiée. Réessayez dans un instant.",
+    configuration: "L'adresse du serveur n'est pas configurée (NEXT_PUBLIC_API_URL).",
+  };
+  const message = raison ? messages[raison] : undefined;
+  if (!message) return null;
   return (
     <p
       role="status"
       className="mt-6 max-w-sm rounded-md border border-primary/30 bg-primary/5 px-3.5 py-2.5 text-sm text-ink"
     >
-      Votre session a expiré. Reconnectez-vous pour continuer.
+      {message}
     </p>
   );
 }
@@ -102,7 +100,7 @@ export default function LoginPage() {
         </p>
 
         <Suspense fallback={null}>
-          <AvisSessionExpiree />
+          <AvisSession />
         </Suspense>
 
         <form
