@@ -13,13 +13,13 @@ function ModulePlaceholder({ title }) {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-[#1E3A8A]">Gestion académique</p>
+        <p className="text-sm font-semibold text-iuc-blue">Gestion académique</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{title}</h1>
       </div>
       <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
         <h2 className="font-bold text-slate-900">Espace en préparation</h2>
         <p className="mt-2 text-sm leading-6 text-slate-500">
-          Cette rubrique sera bientôt disponible dans ANANSI.
+          Cette rubrique sera bientôt disponible sur IUC Campus.
         </p>
       </section>
     </DashboardLayout>

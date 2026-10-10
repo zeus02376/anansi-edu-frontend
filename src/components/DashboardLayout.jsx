@@ -7,7 +7,7 @@ function DashboardLayout({ children }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#F5F7FB]">
+    <div className="min-h-screen bg-iuc-light">
       <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div className="min-h-screen lg:pl-72">
         <Navbar onMenuClick={() => setMenuOpen(true)} />

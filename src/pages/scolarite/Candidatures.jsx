@@ -13,7 +13,7 @@ const statusLabels = {
 }
 
 const statusStyles = {
-  SOUMIS: 'bg-blue-50 text-blue-700',
+  SOUMIS: 'bg-iuc-blue/10 text-iuc-blue',
   INCOMPLET: 'bg-amber-50 text-amber-700',
   EN_EXAMEN: 'bg-violet-50 text-violet-700',
   ACCEPTE: 'bg-emerald-50 text-emerald-700',
@@ -91,7 +91,7 @@ function Candidatures() {
     <DashboardLayout>
       <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-semibold text-[#1E3A8A]">Admissions</p>
+          <p className="text-sm font-semibold text-iuc-blue">Admissions</p>
           <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
             Candidatures
           </h1>
@@ -104,7 +104,7 @@ function Candidatures() {
           <select
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
-            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-[#1E3A8A] focus:ring-4 focus:ring-blue-900/10"
+            className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-iuc-blue focus:ring-4 focus:ring-iuc-blue/10"
           >
             <option value="TOUS">Tous les statuts</option>
             {statuses.map((status) => (
@@ -197,7 +197,7 @@ function Candidatures() {
                         value={candidature.statut}
                         disabled={updating[candidature.id]}
                         onChange={(event) => changeStatus(candidature, event.target.value)}
-                        className="max-w-36 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-[#1E3A8A] disabled:opacity-60"
+                        className="max-w-36 rounded-lg border border-slate-200 bg-white px-2.5 py-2 text-xs font-semibold text-slate-700 outline-none focus:border-iuc-blue disabled:opacity-60"
                       >
                         {statuses.map((status) => (
                           <option key={status} value={status}>

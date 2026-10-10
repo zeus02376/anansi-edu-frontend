@@ -3,9 +3,9 @@ import DashboardLayout from '../../components/DashboardLayout'
 import api from '../../services/api'
 
 const statCards = [
-  { key: 'tenants', label: 'Établissements', description: 'Universités sur ANANSI', tone: 'bg-blue-50 text-blue-700' },
-  { key: 'ecoles', label: 'Écoles', description: 'Structures académiques', tone: 'bg-violet-50 text-violet-700' },
-  { key: 'etudiants', label: 'Étudiants', description: 'Dossiers enregistrés', tone: 'bg-emerald-50 text-emerald-700' },
+  { key: 'tenants', label: 'Établissements', description: 'Universités sur IUC Campus', tone: 'bg-iuc-gold/15 text-iuc-blue' },
+  { key: 'ecoles', label: 'Écoles', description: 'Structures académiques', tone: 'bg-iuc-blue/10 text-iuc-blue' },
+  { key: 'etudiants', label: 'Étudiants', description: 'Dossiers enregistrés', tone: 'bg-iuc-gold/15 text-iuc-blue' },
 ]
 
 function Dashboard() {
@@ -45,7 +45,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-[#1E3A8A]">Vue d’ensemble</p>
+        <p className="text-sm font-semibold text-iuc-blue">Vue d’ensemble</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           Tableau de bord Admin
         </h1>
@@ -90,7 +90,7 @@ function Dashboard() {
         <h2 className="text-lg font-bold text-slate-900">Bienvenue dans votre espace Admin</h2>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
           Utilisez la navigation pour gérer les établissements, les structures
-          académiques, les enseignants et les étudiants de la plateforme.
+          académiques, les enseignants et les étudiants d’IUC Campus.
         </p>
       </section>
     </DashboardLayout>

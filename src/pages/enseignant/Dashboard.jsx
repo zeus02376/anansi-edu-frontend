@@ -4,7 +4,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-[#1E3A8A]">Espace enseignant</p>
+        <p className="text-sm font-semibold text-iuc-blue">Espace enseignant</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           Tableau de bord Enseignant
         </h1>

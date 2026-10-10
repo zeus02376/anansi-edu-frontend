@@ -43,49 +43,50 @@ function Login() {
 
   return (
     <main className="min-h-screen bg-white lg:grid lg:grid-cols-[1fr_0.92fr]">
-      <section className="relative hidden overflow-hidden bg-[#1E3A8A] px-12 py-14 text-white lg:flex lg:flex-col lg:justify-between xl:px-20">
+      <section className="relative hidden overflow-hidden bg-iuc-blue px-12 py-14 text-white lg:flex lg:flex-col lg:justify-between xl:px-20">
         <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border border-white/10" />
         <div className="absolute -bottom-36 -left-24 h-96 w-96 rounded-full border border-white/10" />
         <div className="relative flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-xl font-black text-[#1E3A8A]">
-            A
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-iuc-gold text-xl font-black text-iuc-blue">
+            I
           </div>
-          <span className="text-xl font-extrabold tracking-[0.16em]">ANANSI</span>
+          <span className="text-xl font-extrabold tracking-[0.08em] text-iuc-gold">
+            IUC Campus
+          </span>
         </div>
         <div className="relative max-w-xl py-14">
-          <p className="mb-5 text-sm font-bold uppercase tracking-[0.2em] text-blue-200">
-            L’avenir de l’éducation
+          <p className="mb-5 text-sm font-bold uppercase tracking-[0.2em] text-iuc-gold">
+            Institut Universitaire de la Côte
           </p>
           <h1 className="text-4xl font-bold leading-tight xl:text-5xl">
-            Une université mieux connectée, une réussite mieux accompagnée.
+            IUC Campus
           </h1>
-          <p className="mt-6 max-w-lg text-lg leading-8 text-blue-100">
-            Gérez les parcours, les candidatures et la vie académique depuis un espace
-            conçu pour votre établissement.
+          <p className="mt-6 max-w-lg text-lg leading-8 text-white/80">
+            Plateforme de gestion académique
           </p>
         </div>
-        <p className="relative text-sm text-blue-200">
-          © {new Date().getFullYear()} ANANSI EdTech
+        <p className="relative text-sm text-white/80">
+          Institut Universitaire de la Côte © 2025
         </p>
       </section>
 
       <section className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10">
         <div className="w-full max-w-md">
           <div className="mb-12 flex items-center gap-3 lg:hidden">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1E3A8A] text-lg font-black text-white">
-              A
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-iuc-blue text-lg font-black text-iuc-gold">
+              I
             </div>
-            <span className="text-lg font-extrabold tracking-[0.14em] text-slate-900">
-              ANANSI
+            <span className="text-lg font-extrabold tracking-[0.08em] text-iuc-blue">
+              IUC Campus
             </span>
           </div>
           <div className="mb-9">
-            <p className="text-sm font-semibold text-[#1E3A8A]">Bienvenue sur ANANSI</p>
-            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">
-              Connectez-vous
+            <p className="text-sm font-semibold text-iuc-blue">Bienvenue à l’IUC</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-iuc-blue">
+              IUC Campus
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              Accédez à votre espace académique avec vos identifiants.
+              Plateforme de gestion académique
             </p>
           </div>
 
@@ -99,7 +100,7 @@ function Login() {
                 type="email"
                 autoComplete="email"
                 placeholder="nom@universite.cm"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3A8A] focus:ring-4 focus:ring-blue-900/10"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-iuc-blue focus:ring-4 focus:ring-iuc-blue/10"
                 {...register('email', {
                   required: 'Votre adresse e-mail est requise.',
                   pattern: {
@@ -122,7 +123,7 @@ function Login() {
                 type="password"
                 autoComplete="current-password"
                 placeholder="Votre mot de passe"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#1E3A8A] focus:ring-4 focus:ring-blue-900/10"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-iuc-blue focus:ring-4 focus:ring-iuc-blue/10"
                 {...register('password', {
                   required: 'Votre mot de passe est requis.',
                 })}
@@ -144,7 +145,7 @@ function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#1E3A8A] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-950/15 transition hover:bg-blue-900 focus:outline-none focus:ring-4 focus:ring-blue-900/20 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-iuc-blue px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-iuc-blue/15 transition hover:bg-iuc-blue/90 focus:outline-none focus:ring-4 focus:ring-iuc-blue/20 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isLoading && (
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" />
@@ -154,7 +155,7 @@ function Login() {
           </form>
 
           <p className="mt-8 text-center text-xs leading-5 text-slate-400">
-            Votre accès est géré par l’administration de votre établissement.
+            Institut Universitaire de la Côte © 2025
           </p>
         </div>
       </section>

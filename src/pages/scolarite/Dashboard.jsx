@@ -5,7 +5,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-[#1E3A8A]">Espace scolarité</p>
+        <p className="text-sm font-semibold text-iuc-blue">Espace scolarité</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           Tableau de bord Scolarité
         </h1>
@@ -23,7 +23,7 @@ function Dashboard() {
           </div>
           <Link
             to="/scolarite/candidatures"
-            className="inline-flex items-center justify-center rounded-xl bg-[#1E3A8A] px-5 py-3 text-sm font-bold text-white transition hover:bg-blue-900"
+            className="inline-flex items-center justify-center rounded-xl bg-iuc-blue px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-blue/90"
           >
             Voir les candidatures
           </Link>
