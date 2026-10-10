@@ -32,8 +32,11 @@ function AvisSession() {
     session: "Votre session a expiré ou n'est plus valide. Reconnectez-vous pour continuer.",
     serveur: "Le serveur est injoignable : votre session n'a pas pu être vérifiée. Réessayez dans un instant.",
     configuration: "L'adresse du serveur n'est pas configurée (NEXT_PUBLIC_API_URL).",
+    deconnexion:
+      "Le serveur n'a pas confirmé la fin de votre session. Sur un ordinateur partagé, fermez le navigateur pour être sûr d'être déconnecté.",
   };
-  const message = raison ? messages[raison] : undefined;
+  const message =
+    raison && Object.hasOwn(messages, raison) ? messages[raison] : undefined;
   if (!message) return null;
   return (
     <p

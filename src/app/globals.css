@@ -201,3 +201,8 @@ body {
     animation: none;
   }
 }
+
+/* Une boîte de dialogue modale ouverte fige la page derrière elle. */
+html:has(dialog[open]) {
+  overflow: hidden;
+}

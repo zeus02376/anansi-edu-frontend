@@ -79,6 +79,14 @@ describe("client d'API", () => {
     });
   });
 
+  it("distingue un délai dépassé d'un serveur injoignable", async () => {
+    simuler(new DOMException("délai", "TimeoutError"));
+    await expect(api.get("/x")).rejects.toMatchObject({
+      nature: "reseau",
+      message: "Le serveur met trop de temps à répondre. Réessayez dans un instant.",
+    });
+  });
+
   it("traduit un serveur injoignable", async () => {
     simuler(new TypeError("Failed to fetch"));
     await expect(api.get("/x")).rejects.toMatchObject({ nature: "reseau" });

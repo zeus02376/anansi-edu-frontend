@@ -1,4 +1,5 @@
 import axios from "axios";
+import { estRouteInconnue, MESSAGES } from "@/lib/api";
 import { terminerSession } from "@/stores/authStore";
 
 export const api = axios.create({
@@ -59,6 +60,11 @@ export function messageErreurApi(
   }
   if (status === 403) {
     return MESSAGE_ACCES_REFUSE;
+  }
+  // La route n'existe pas (encore) sur le serveur : ce n'est pas un élément
+  // introuvable, c'est un service indisponible.
+  if (status === 405 || status === 501 || (status === 404 && estRouteInconnue(data))) {
+    return MESSAGES.indisponible;
   }
   if (status === 404) {
     return lire(data) ?? "L'élément demandé est introuvable.";

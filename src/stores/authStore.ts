@@ -20,7 +20,7 @@ type EtatAuth = {
   erreurSession: ApiError | null;
   chargerSession: () => Promise<void>;
   login: (email: string, password: string) => Promise<Utilisateur>;
-  logout: () => Promise<void>;
+  logout: () => Promise<boolean>;
   viderSession: () => void;
 };
 
@@ -81,13 +81,18 @@ export const useAuthStore = create<EtatAuth>()((set, get) => ({
   },
 
   // TODO backend : POST /auth/logout n'est pas spécifié ; il doit effacer le
-  // cookie de session. La session locale est vidée tout de suite.
-  logout() {
+  // cookie de session. La session locale est vidée tout de suite, mais on
+  // ne dit « déconnecté » que si le serveur l'a confirmé : sinon le cookie
+  // peut rester valable et rouvrir la session au prochain chargement.
+  async logout() {
     get().viderSession();
-    return api.post("/auth/logout", { ignorer401: true }).then(
-      () => undefined,
-      () => undefined,
-    );
+    try {
+      await api.post("/auth/logout", { ignorer401: true });
+      return true;
+    } catch (erreur) {
+      // 401 : le serveur ne connaît déjà plus la session, c'est bien fini.
+      return erreur instanceof ApiError && erreur.nature === "session";
+    }
   },
 
   viderSession() {

@@ -76,6 +76,9 @@ export type Options<S extends ZodType | undefined = undefined> = {
   signal?: AbortSignal;
   // Pour /auth/login et /auth/me, où un 401 est une réponse normale.
   ignorer401?: boolean;
+  // Délai maximal en millisecondes (15 s par défaut) ; à allonger pour
+  // l'envoi de fichiers.
+  delaiMs?: number;
 };
 
 type Resultat<S extends ZodType | undefined> = S extends ZodType
@@ -106,7 +109,7 @@ async function lireJson(reponse: Response): Promise<unknown> {
 
 // « Cannot GET /chemin » : réponse par défaut de Nest pour une route qui
 // n'existe pas.
-function estRouteInconnue(donnees: unknown): boolean {
+export function estRouteInconnue(donnees: unknown): boolean {
   if (typeof donnees !== "object" || donnees === null) return false;
   const { message } = donnees as { message?: unknown };
   return typeof message === "string" && /^Cannot [A-Z]+ \//.test(message);
@@ -155,7 +158,7 @@ async function requete<S extends ZodType | undefined = undefined>(
   chemin: string,
   options: Options<S> = {},
 ): Promise<Resultat<S>> {
-  const delai = AbortSignal.timeout(DELAI_MS);
+  const delai = AbortSignal.timeout(options.delaiMs ?? DELAI_MS);
   const signal = options.signal ? AbortSignal.any([options.signal, delai]) : delai;
   const enFormulaire = options.corps instanceof FormData;
 
@@ -181,6 +184,12 @@ async function requete<S extends ZodType | undefined = undefined>(
   } catch (erreur) {
     // Annulation volontaire de l'appelant : ce n'est pas une erreur à afficher.
     if (options.signal?.aborted) throw erreur;
+    if (erreur instanceof DOMException && erreur.name === "TimeoutError") {
+      throw new ApiError(
+        "reseau",
+        "Le serveur met trop de temps à répondre. Réessayez dans un instant.",
+      );
+    }
     throw new ApiError("reseau");
   }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LIBELLE_ROLE } from "@/lib/roles";
 import { useAuthStore } from "@/stores/authStore";
@@ -17,9 +18,12 @@ export function Navbar({
   const user = useAuthStore((etat) => etat.user);
   const logout = useAuthStore((etat) => etat.logout);
 
-  function seDeconnecter() {
-    logout();
-    router.replace("/login");
+  const [deconnexionEnCours, setDeconnexionEnCours] = useState(false);
+
+  async function seDeconnecter() {
+    setDeconnexionEnCours(true);
+    const confirmee = await logout();
+    router.replace(confirmee ? "/login" : "/login?raison=deconnexion");
   }
 
   // Le nom n'est connu que pendant la session où l'on s'est connecté : il
@@ -70,10 +74,11 @@ export function Navbar({
         )}
         <button
           type="button"
-          onClick={seDeconnecter}
+          onClick={() => void seDeconnecter()}
+          disabled={deconnexionEnCours}
           className={`${CLASSE_BOUTON_SECONDAIRE} shrink-0 px-3.5 py-2`}
         >
-          Se déconnecter
+          {deconnexionEnCours ? "Déconnexion…" : "Se déconnecter"}
         </button>
       </div>
     </header>
