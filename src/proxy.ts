@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { ACCUEIL_PAR_ROLE, lireRole, ROLES_PAR_ESPACE } from "@/lib/roles";
+import {
+  ACCUEIL_PAR_ROLE,
+  cheminNormalise,
+  espaceDuChemin,
+  lireRole,
+  ROLES_PAR_ESPACE,
+} from "@/lib/roles";
 
 // Contrôle d'accès avant l'affichage d'une page (« middleware » : il
 // s'appelle proxy depuis Next 16).
@@ -21,6 +27,9 @@ export async function proxy(request: NextRequest) {
     if (raison) url.searchParams.set("raison", raison);
     return NextResponse.redirect(url);
   };
+
+  const chemin = cheminNormalise(pathname);
+  if (chemin === null) return vers("/login");
 
   const api = process.env.NEXT_PUBLIC_API_URL?.replace(/\/+$/, "");
   if (!api) return vers("/login", "configuration");
@@ -48,9 +57,7 @@ export async function proxy(request: NextRequest) {
   const role = lireRole((donnees as { role?: unknown } | null)?.role);
   if (!role) return vers("/login", "session");
 
-  const espace = Object.keys(ROLES_PAR_ESPACE).find(
-    (prefixe) => pathname === prefixe || pathname.startsWith(`${prefixe}/`),
-  );
+  const espace = espaceDuChemin(chemin);
   if (espace && !ROLES_PAR_ESPACE[espace].includes(role)) {
     return vers(ACCUEIL_PAR_ROLE[role]);
   }

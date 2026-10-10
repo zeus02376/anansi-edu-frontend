@@ -19,6 +19,26 @@ export const ROLES_PAR_ESPACE: Record<string, readonly Role[]> = {
   "/etudiant": ["ETUDIANT"],
 };
 
+// Espace (ex. "/scolarite") auquel appartient un chemin, ou null. Le chemin
+// est décodé et débarrassé des barres en double : `/%73colarite` ou
+// `//scolarite` désignent la même page que `/scolarite`. Un chemin mal
+// encodé (null renvoyé par `cheminNormalise`) ne doit jamais passer.
+export function cheminNormalise(pathname: string): string | null {
+  try {
+    return decodeURIComponent(pathname).replace(/\/{2,}/g, "/");
+  } catch {
+    return null;
+  }
+}
+
+export function espaceDuChemin(chemin: string): string | null {
+  return (
+    Object.keys(ROLES_PAR_ESPACE).find(
+      (prefixe) => chemin === prefixe || chemin.startsWith(`${prefixe}/`),
+    ) ?? null
+  );
+}
+
 export const LIBELLE_ROLE: Record<Role, string> = {
   ADMIN: "Administrateur",
   SCOLARITE: "Scolarité",
