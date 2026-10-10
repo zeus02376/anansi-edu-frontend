@@ -5,6 +5,8 @@ import { useAuthStore } from '../stores/authStore'
 const navigationByRole = {
   ADMIN: [
     { label: 'Tableau de bord', to: '/admin', icon: '⌂' },
+    { label: 'Candidatures', to: '/scolarite/candidatures', icon: '▣' },
+    { label: 'Comptes', to: '/admin/comptes', icon: '☺' },
     { label: 'Tenants', to: '/admin/tenants', icon: '◫' },
     { label: 'Écoles', to: '/admin/ecoles', icon: '▤' },
     { label: 'Filières', to: '/admin/filieres', icon: '⌘' },

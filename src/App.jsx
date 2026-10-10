@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import DashboardLayout from './components/DashboardLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/auth/Login'
+import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
 import Candidatures from './pages/scolarite/Candidatures'
 import ScolariteDashboard from './pages/scolarite/Dashboard'
@@ -38,6 +39,7 @@ function App() {
 
       <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin/comptes" element={<Comptes />} />
         <Route path="/admin/tenants" element={<ModulePlaceholder title="Tenants" />} />
         <Route path="/admin/ecoles" element={<ModulePlaceholder title="Écoles" />} />
         <Route path="/admin/filieres" element={<ModulePlaceholder title="Filières" />} />
