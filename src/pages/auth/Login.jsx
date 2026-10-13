@@ -2,13 +2,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../stores/authStore'
-
-const dashboardByRole = {
-  ADMIN: '/admin',
-  SCOLARITE: '/scolarite',
-  ENSEIGNANT: '/enseignant',
-  ETUDIANT: '/etudiant',
-}
+import { dashboardByRole } from '../../utils/dashboard'
 
 function Login() {
   const navigate = useNavigate()
