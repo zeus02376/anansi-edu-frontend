@@ -5,7 +5,7 @@ import api from './api'
 const tenant = import.meta.env.VITE_TENANT_SLUG
 
 /** GET public : pas de JWT, et l'établissement ciblé si configuré. */
-const getPublic = (url, { params, signal } = {}) =>
+export const getPublic = (url, { params, signal } = {}) =>
   api
     .get(url, { skipAuth: true, signal, params: { ...(tenant && { tenant }), ...params } })
     .then((response) => response.data)

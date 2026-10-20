@@ -8,6 +8,7 @@ import Accueil from './pages/public/Accueil'
 import Candidature from './pages/public/Candidature'
 import FiliereDetail from './pages/public/FiliereDetail'
 import Filieres from './pages/public/Filieres'
+import Suivi from './pages/public/Suivi'
 import ChangerMotDePasse from './pages/auth/ChangerMotDePasse'
 import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -46,6 +47,7 @@ function App() {
         <Route path="/filieres" element={<Filieres />} />
         <Route path="/filieres/:id" element={<FiliereDetail />} />
         <Route path="/candidature" element={<Candidature />} />
+        <Route path="/suivi" element={<Suivi />} />
       </Route>
       <Route path="/login" element={<Login />} />
 

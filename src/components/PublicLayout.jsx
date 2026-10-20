@@ -5,6 +5,8 @@ import BrandMark from './BrandMark'
 const links = [
   { label: 'Accueil', to: '/', end: true },
   { label: 'Filières', to: '/filieres' },
+  { label: 'Candidature', to: '/candidature' },
+  { label: 'Suivi', to: '/suivi' },
 ]
 
 const linkClass = ({ isActive }) =>
@@ -65,6 +67,12 @@ function PublicLayout() {
           <nav aria-label="Liens du pied de page" className="flex gap-5 text-sm">
             <Link className="hover:text-white" to="/filieres">
               Filières
+            </Link>
+            <Link className="hover:text-white" to="/candidature">
+              Candidature
+            </Link>
+            <Link className="hover:text-white" to="/suivi">
+              Suivi
             </Link>
             <Link className="hover:text-white" to="/login">
               Espace connecté
