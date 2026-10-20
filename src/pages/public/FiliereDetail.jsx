@@ -10,6 +10,7 @@ import {
   modeAdmissionLabels,
   regimeLabels,
 } from '../../utils/catalogue'
+import { ecoleAccent } from '../../utils/ecoleAccent'
 import { getErrorMessage } from '../../utils/errors'
 import { usePageTitle } from '../../utils/usePageTitle'
 
@@ -97,6 +98,7 @@ function FiliereDetail() {
   }
 
   const { ecole } = filiere
+  const accent = ecoleAccent(ecole)
   const national = formatMontant(filiere.fraisCandidatureNational)
   const etranger = formatMontant(filiere.fraisCandidatureEtranger)
 
@@ -125,7 +127,7 @@ function FiliereDetail() {
             {filiere.nom}
           </h1>
           <p className="mt-2 text-slate-500">
-            {ecole.nom}
+            <span className={accent.text}>{ecole.nom}</span>
             {ecole.campus ? ` · Campus ${ecole.campus.nom}` : ''}
           </p>
         </div>
@@ -185,7 +187,9 @@ function FiliereDetail() {
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-iuc-blue">L’école et le campus</h2>
-            <p className="mt-4 text-sm font-semibold text-slate-800">{ecole.nom}</p>
+            <p className={`mt-4 text-sm font-semibold ${accent.text || 'text-slate-800'}`}>
+              {ecole.nom}
+            </p>
             {ecole.description && (
               <p className="mt-1 text-sm leading-6 text-slate-500">{ecole.description}</p>
             )}
