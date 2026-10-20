@@ -6,6 +6,7 @@ import Modal from '../../components/ui/Modal'
 import StatusBadge from '../../components/ui/StatusBadge'
 import { inputClass } from '../../components/ui/styles'
 import api from '../../services/api'
+import { fetchEcoles, fetchToutesLesFilieres } from '../../services/catalogue'
 import { useAuthStore } from '../../stores/authStore'
 import { statuses, statusLabels } from '../../utils/candidatureStatus'
 import { getErrorMessage } from '../../utils/errors'
@@ -98,15 +99,11 @@ function Candidatures() {
     })
   }, [candidatures, filter, search])
 
-  const hasStudentAccount = (candidature) =>
-    Boolean(
-      createdStudents[candidature.id] ||
-        students.some(
-          (student) =>
-            student.user?.email?.toLocaleLowerCase() ===
-            candidature.email?.toLocaleLowerCase(),
-        ),
-    )
+  // Compte étudiant créé depuis cette candidature (lien exact par candidatureId)
+  const studentFor = (candidature) =>
+    createdStudents[candidature.id] ??
+    students.find((student) => student.candidatureId === candidature.id)
+  const hasStudentAccount = (candidature) => Boolean(studentFor(candidature))
 
   const openDetails = async (candidature) => {
     setSelectedCandidature(candidature)
@@ -207,18 +204,19 @@ function Candidatures() {
     candidatureForm.reset()
 
     try {
-      const [filieresResponse, anneesResponse, ecolesResponse] = await Promise.all([
-        api.get('/filieres'),
+      // /filieres et /ecoles sont publiques (sans JWT) ; /annees-academiques exige encore un JWT
+      const [filieresData, anneesResponse, ecolesData] = await Promise.all([
+        fetchToutesLesFilieres(),
         api.get('/annees-academiques'),
-        api.get('/ecoles'),
+        fetchEcoles(),
       ])
       const tenantEcoleIds = new Set(
-        (Array.isArray(ecolesResponse.data) ? ecolesResponse.data : [])
+        (Array.isArray(ecolesData) ? ecolesData : [])
           .filter((ecole) => ecole.tenantId === user.tenantId)
           .map((ecole) => ecole.id),
       )
       setOptions({
-        filieres: (Array.isArray(filieresResponse.data) ? filieresResponse.data : [])
+        filieres: (Array.isArray(filieresData) ? filieresData : [])
           .filter((filiere) => tenantEcoleIds.has(filiere.ecoleId)),
         annees: (Array.isArray(anneesResponse.data) ? anneesResponse.data : [])
           .filter((annee) => annee.tenantId === user.tenantId),
@@ -506,13 +504,7 @@ function Candidatures() {
                           )}
                           {studentExists && (
                             <span className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-                              {createdStudents[candidature.id]?.matricule ||
-                                students.find(
-                                  (student) =>
-                                    student.user?.email?.toLocaleLowerCase() ===
-                                    candidature.email?.toLocaleLowerCase(),
-                                )?.matricule ||
-                                'Compte créé'}
+                              {studentFor(candidature)?.matricule || 'Compte créé'}
                             </span>
                           )}
                         </div>

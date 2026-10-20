@@ -17,6 +17,9 @@ const getPublic = (url, { params, signal } = {}) =>
 export const fetchFilieres = (filtres = {}, signal) =>
   getPublic('/filieres/suggestions', { params: filtres, signal })
 
+/** Toutes les filières de l'établissement (GET /filieres), sans filtre. */
+export const fetchToutesLesFilieres = (signal) => getPublic('/filieres', { signal })
+
 export const fetchFiliere = (id, signal) => getPublic(`/filieres/${id}`, { signal })
 
 export const fetchCampus = (signal) => getPublic('/campus', { signal })
