@@ -1,104 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import PropTypes from 'prop-types'
 import DashboardLayout from '../../components/DashboardLayout'
+import Field from '../../components/ui/Field'
+import Modal from '../../components/ui/Modal'
+import StatusBadge from '../../components/ui/StatusBadge'
+import { inputClass } from '../../components/ui/styles'
 import api from '../../services/api'
+import { fetchEcoles, fetchToutesLesFilieres } from '../../services/catalogue'
 import { useAuthStore } from '../../stores/authStore'
-
-const statuses = ['SOUMIS', 'EN_EXAMEN', 'ACCEPTE', 'REJETE', 'INCOMPLET']
-
-const statusLabels = {
-  SOUMIS: 'Soumis',
-  EN_EXAMEN: 'En examen',
-  ACCEPTE: 'Accepté',
-  REJETE: 'Rejeté',
-  INCOMPLET: 'Incomplet',
-}
-
-const statusStyles = {
-  SOUMIS: 'bg-amber-100 text-amber-800',
-  EN_EXAMEN: 'bg-blue-100 text-blue-800',
-  ACCEPTE: 'bg-emerald-100 text-emerald-800',
-  REJETE: 'bg-red-100 text-red-800',
-  INCOMPLET: 'bg-slate-100 text-slate-700',
-}
-
-function getErrorMessage(error, fallback) {
-  if (error.code === 'ECONNABORTED') {
-    return 'Le serveur met trop de temps à répondre. Vérifiez la connexion puis réessayez.'
-  }
-  const message = error.response?.data?.message
-  if (Array.isArray(message)) return message.join(', ')
-  return message || error.message || fallback
-}
-
-function formatDate(value) {
-  if (!value) return '—'
-  const date = new Date(value)
-  return Number.isNaN(date.getTime())
-    ? '—'
-    : new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(date)
-}
-
-function Modal({ title, onClose, children, wide = false }) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-0 backdrop-blur-sm sm:items-center sm:p-4"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose()
-      }}
-    >
-      <section
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        className={`max-h-[92vh] w-full overflow-y-auto rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl ${
-          wide ? 'max-w-2xl' : 'max-w-lg'
-        }`}
-        role="dialog"
-      >
-        <div className="sticky top-0 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4 sm:px-6">
-          <h2 id="modal-title" className="text-lg font-bold text-iuc-blue">
-            {title}
-          </h2>
-          <button
-            aria-label="Fermer"
-            className="rounded-lg px-3 py-1.5 text-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-            onClick={onClose}
-            type="button"
-          >
-            ×
-          </button>
-        </div>
-        <div className="p-5 sm:p-6">{children}</div>
-      </section>
-    </div>
-  )
-}
-
-Modal.propTypes = {
-  title: PropTypes.string.isRequired,
-  onClose: PropTypes.func.isRequired,
-  children: PropTypes.node.isRequired,
-  wide: PropTypes.bool,
-}
-
-function Field({ label, error, children }) {
-  return (
-    <div>
-      <label className="mb-1.5 block text-sm font-semibold text-slate-700">
-        <span className="mb-1.5 block">{label}</span>
-        {children}
-      </label>
-      {error && <p className="mt-1 text-xs text-red-600">{error.message}</p>}
-    </div>
-  )
-}
-
-Field.propTypes = {
-  label: PropTypes.string.isRequired,
-  error: PropTypes.object,
-  children: PropTypes.node.isRequired,
-}
+import { statuses, statusLabels } from '../../utils/candidatureStatus'
+import { getErrorMessage } from '../../utils/errors'
+import { formatDate } from '../../utils/format'
 
 function Candidatures() {
   const user = useAuthStore((state) => state.user)
@@ -187,15 +99,11 @@ function Candidatures() {
     })
   }, [candidatures, filter, search])
 
-  const hasStudentAccount = (candidature) =>
-    Boolean(
-      createdStudents[candidature.id] ||
-        students.some(
-          (student) =>
-            student.user?.email?.toLocaleLowerCase() ===
-            candidature.email?.toLocaleLowerCase(),
-        ),
-    )
+  // Compte étudiant créé depuis cette candidature (lien exact par candidatureId)
+  const studentFor = (candidature) =>
+    createdStudents[candidature.id] ??
+    students.find((student) => student.candidatureId === candidature.id)
+  const hasStudentAccount = (candidature) => Boolean(studentFor(candidature))
 
   const openDetails = async (candidature) => {
     setSelectedCandidature(candidature)
@@ -296,18 +204,19 @@ function Candidatures() {
     candidatureForm.reset()
 
     try {
-      const [filieresResponse, anneesResponse, ecolesResponse] = await Promise.all([
-        api.get('/filieres'),
+      // /filieres et /ecoles sont publiques (sans JWT) ; /annees-academiques exige encore un JWT
+      const [filieresData, anneesResponse, ecolesData] = await Promise.all([
+        fetchToutesLesFilieres(),
         api.get('/annees-academiques'),
-        api.get('/ecoles'),
+        fetchEcoles(),
       ])
       const tenantEcoleIds = new Set(
-        (Array.isArray(ecolesResponse.data) ? ecolesResponse.data : [])
+        (Array.isArray(ecolesData) ? ecolesData : [])
           .filter((ecole) => ecole.tenantId === user.tenantId)
           .map((ecole) => ecole.id),
       )
       setOptions({
-        filieres: (Array.isArray(filieresResponse.data) ? filieresResponse.data : [])
+        filieres: (Array.isArray(filieresData) ? filieresData : [])
           .filter((filiere) => tenantEcoleIds.has(filiere.ecoleId)),
         annees: (Array.isArray(anneesResponse.data) ? anneesResponse.data : [])
           .filter((annee) => annee.tenantId === user.tenantId),
@@ -367,9 +276,6 @@ function Candidatures() {
     setSelectedCandidature(null)
     setModalError('')
   }
-
-  const inputClass =
-    'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-iuc-blue focus:ring-4 focus:ring-iuc-blue/10'
 
   return (
     <DashboardLayout>
@@ -557,13 +463,7 @@ function Candidatures() {
                         {candidature.filiere?.nom ?? '—'}
                       </td>
                       <td className="px-4 py-4">
-                        <span
-                          className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-bold ${
-                            statusStyles[candidature.statut] ?? 'bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {statusLabels[candidature.statut] ?? candidature.statut}
-                        </span>
+                        <StatusBadge statut={candidature.statut} />
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-sm text-slate-500">
                         {formatDate(candidature.createdAt)}
@@ -604,13 +504,7 @@ function Candidatures() {
                           )}
                           {studentExists && (
                             <span className="rounded-lg bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700">
-                              {createdStudents[candidature.id]?.matricule ||
-                                students.find(
-                                  (student) =>
-                                    student.user?.email?.toLocaleLowerCase() ===
-                                    candidature.email?.toLocaleLowerCase(),
-                                )?.matricule ||
-                                'Compte créé'}
+                              {studentFor(candidature)?.matricule || 'Compte créé'}
                             </span>
                           )}
                         </div>
