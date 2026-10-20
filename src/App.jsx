@@ -15,7 +15,9 @@ import AdminDashboard from './pages/admin/Dashboard'
 import Candidatures from './pages/scolarite/Candidatures'
 import ScolariteDashboard from './pages/scolarite/Dashboard'
 import EnseignantDashboard from './pages/enseignant/Dashboard'
+import EnseignantMatieres from './pages/enseignant/Matieres'
 import EtudiantDashboard from './pages/etudiant/Dashboard'
+import EtudiantDossier from './pages/etudiant/Dossier'
 import { CHANGE_PASSWORD_PATH } from './utils/dashboard'
 
 function ModulePlaceholder({ title }) {
@@ -79,18 +81,12 @@ function App() {
 
       <Route element={<ProtectedRoute allowedRoles={['ENSEIGNANT']} />}>
         <Route path="/enseignant" element={<EnseignantDashboard />} />
-        <Route
-          path="/enseignant/matieres"
-          element={<ModulePlaceholder title="Mes matières" />}
-        />
+        <Route path="/enseignant/matieres" element={<EnseignantMatieres />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['ETUDIANT']} />}>
         <Route path="/etudiant" element={<EtudiantDashboard />} />
-        <Route
-          path="/etudiant/dossier"
-          element={<ModulePlaceholder title="Mon dossier" />}
-        />
+        <Route path="/etudiant/dossier" element={<EtudiantDossier />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>
