@@ -5,14 +5,17 @@ const etapes = [
   {
     titre: 'Explorer',
     texte: 'Consultez les filières par école et par campus : niveau d’entrée, frais et pièces à fournir.',
+    lien: { to: '/filieres', label: 'Voir les filières' },
   },
   {
     titre: 'Candidater',
     texte: 'Déposez votre dossier en ligne pour la filière de votre choix.',
+    lien: { to: '/candidature', label: 'Déposer ma candidature' },
   },
   {
     titre: 'Suivre',
     texte: 'Retrouvez l’avancement de votre candidature avec votre numéro de dossier.',
+    lien: { to: '/suivi', label: 'Suivre ma candidature' },
   },
 ]
 
@@ -49,6 +52,12 @@ function Accueil() {
               Candidater en ligne
             </Link>
           </div>
+          <p className="mt-5 text-sm text-white/70">
+            Déjà candidat ?{' '}
+            <Link className="font-semibold text-white underline hover:text-iuc-gold" to="/suivi">
+              Suivre ma candidature
+            </Link>
+          </p>
         </div>
       </section>
 
@@ -68,6 +77,9 @@ function Accueil() {
               </span>
               <h3 className="mt-4 font-bold text-slate-900">{etape.titre}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-500">{etape.texte}</p>
+              <Link className="mt-4 inline-block text-sm font-bold text-iuc-blue hover:underline" to={etape.lien.to}>
+                {etape.lien.label} →
+              </Link>
             </li>
           ))}
         </ol>
