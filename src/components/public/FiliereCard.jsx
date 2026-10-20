@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { ecoleAccent } from '../../utils/ecoleAccent'
 import {
   cycleLabels,
   formatDuree,
@@ -21,12 +22,15 @@ Info.propTypes = { label: PropTypes.string.isRequired, children: PropTypes.node 
 /** Carte d'une filière dans le catalogue public. */
 function FiliereCard({ filiere }) {
   const { ecole } = filiere
+  const accent = ecoleAccent(ecole)
   const national = formatMontant(filiere.fraisCandidatureNational)
   const etranger = formatMontant(filiere.fraisCandidatureEtranger)
   const duree = formatDuree(filiere.dureeAnnees)
 
   return (
-    <article className="relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-iuc-blue/30 hover:shadow-md">
+    <article
+      className={`relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-iuc-blue/30 hover:shadow-md ${accent.border}`}
+    >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-iuc-blue/10 px-2.5 py-1 text-xs font-bold text-iuc-blue">
           {cycleLabels[filiere.cycle] ?? filiere.cycle}
