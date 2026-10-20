@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import DocumentsUploader from './DocumentsUploader'
 
 /** Étape finale : numéro de dossier à conserver, puis envoi (facultatif) des documents. */
 function Confirmation({ dossier, onNouvelle, titleRef }) {
@@ -45,6 +46,26 @@ function Confirmation({ dossier, onNouvelle, titleRef }) {
         >
           Suivre ma candidature →
         </Link>
+      </section>
+
+      <section>
+        <h2 className="text-lg font-bold text-iuc-blue">Envoyer mes documents</h2>
+        <p className="mt-2 text-sm text-slate-500">
+          Vous pouvez envoyer vos pièces maintenant ou plus tard : ce n’est pas obligatoire pour
+          finaliser le dépôt. Pour le faire plus tard, utilisez la page{' '}
+          <Link className="font-semibold text-iuc-blue underline" to="/suivi">
+            Suivi
+          </Link>{' '}
+          avec votre numéro de dossier et l’e-mail de votre candidature ({dossier.email}).
+        </p>
+        <div className="mt-4">
+          <DocumentsUploader
+            candidatureId={dossier.id}
+            email={dossier.email}
+            numeroDossier={dossier.numeroDossier}
+            piecesRequises={dossier.piecesRequises}
+          />
+        </div>
       </section>
 
       <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-between">
