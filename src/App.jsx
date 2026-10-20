@@ -5,6 +5,9 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PublicLayout from './components/PublicLayout'
 import Login from './pages/auth/Login'
 import Accueil from './pages/public/Accueil'
+import Candidature from './pages/public/Candidature'
+import FiliereDetail from './pages/public/FiliereDetail'
+import Filieres from './pages/public/Filieres'
 import ChangerMotDePasse from './pages/auth/ChangerMotDePasse'
 import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -40,6 +43,9 @@ function App() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Accueil />} />
+        <Route path="/filieres" element={<Filieres />} />
+        <Route path="/filieres/:id" element={<FiliereDetail />} />
+        <Route path="/candidature" element={<Candidature />} />
       </Route>
       <Route path="/login" element={<Login />} />
 

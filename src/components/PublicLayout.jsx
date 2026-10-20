@@ -2,7 +2,10 @@ import { useEffect } from 'react'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import BrandMark from './BrandMark'
 
-const links = [{ label: 'Accueil', to: '/', end: true }]
+const links = [
+  { label: 'Accueil', to: '/', end: true },
+  { label: 'Filières', to: '/filieres' },
+]
 
 const linkClass = ({ isActive }) =>
   `border-b-2 px-1 py-1.5 text-sm font-semibold transition ${
@@ -60,6 +63,9 @@ function PublicLayout() {
             <BrandMark subtitle="Institut Universitaire de la Côte" />
           </div>
           <nav aria-label="Liens du pied de page" className="flex gap-5 text-sm">
+            <Link className="hover:text-white" to="/filieres">
+              Filières
+            </Link>
             <Link className="hover:text-white" to="/login">
               Espace connecté
             </Link>
