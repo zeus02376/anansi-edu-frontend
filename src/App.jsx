@@ -2,7 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import DashboardLayout from './components/DashboardLayout'
 import ProtectedRoute from './components/ProtectedRoute'
+import PublicLayout from './components/PublicLayout'
 import Login from './pages/auth/Login'
+import Accueil from './pages/public/Accueil'
 import ChangerMotDePasse from './pages/auth/ChangerMotDePasse'
 import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
@@ -36,7 +38,9 @@ ModulePlaceholder.propTypes = {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<Accueil />} />
+      </Route>
       <Route path="/login" element={<Login />} />
 
       <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
