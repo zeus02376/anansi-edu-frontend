@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import DashboardLayout from '../../components/DashboardLayout'
 import Field from '../../components/ui/Field'
@@ -6,11 +6,57 @@ import Modal from '../../components/ui/Modal'
 import StatusBadge from '../../components/ui/StatusBadge'
 import { inputClass } from '../../components/ui/styles'
 import api from '../../services/api'
+import {
+  fetchCandidatureDocument,
+  retryCandidatureNotification,
+} from '../../services/candidatureStaff'
 import { fetchEcoles, fetchToutesLesFilieres } from '../../services/catalogue'
 import { useAuthStore } from '../../stores/authStore'
 import { statuses, statusLabels } from '../../utils/candidatureStatus'
 import { getErrorMessage } from '../../utils/errors'
 import { formatDate } from '../../utils/format'
+
+const notificationLabels = {
+  EN_ATTENTE: 'En attente',
+  EN_COURS: 'En cours d’envoi',
+  ENVOYEE: 'Envoyée',
+  ECHEC: 'Échec',
+}
+
+const notificationStatus = (notification) => notification?.statut
+
+// Un SMTP lent laisse la notification « en cours » : on relit le dossier toutes les
+// 3 s (30 s au plus) jusqu'à son état final, sans que le personnel recharge la liste.
+const PENDING_NOTIFICATIONS = ['EN_ATTENTE', 'EN_COURS']
+const isPending = (status) => PENDING_NOTIFICATIONS.includes(status)
+const hasPendingNotification = (candidature) =>
+  Boolean(candidature?.notifications?.some((item) => isPending(notificationStatus(item))))
+const NOTIFICATION_POLL_MS = 3000
+const NOTIFICATION_POLL_MAX_ATTEMPTS = 10
+
+const safeDocumentName = (name, id) => {
+  const safeName = Array.from(String(name || `document-${id}`), (character) => {
+    const code = character.charCodeAt(0)
+    return /[\\/:*?"<>|]/.test(character) || code < 32 || code === 127
+      ? '_'
+      : character
+  })
+    .join('')
+    .trim()
+  return safeName || `document-${id}`
+}
+
+const notificationStatusMessage = (status, isRetry = false) => {
+  if (status === 'ENVOYEE') return 'Le courriel a été envoyé avec succès.'
+  if (status === 'ECHEC') {
+    return isRetry
+      ? 'Le nouvel envoi a échoué. Le statut de la candidature reste enregistré ; vous pouvez réessayer.'
+      : 'Le statut de la candidature est enregistré, mais le courriel n’a pas été envoyé. Vous pouvez réessayer depuis les détails.'
+  }
+  if (status === 'EN_COURS') return 'Le courriel est en cours d’envoi.'
+  if (status === 'EN_ATTENTE') return 'Le courriel est en attente d’envoi.'
+  return 'Le statut a bien été enregistré.'
+}
 
 function Candidatures() {
   const user = useAuthStore((state) => state.user)
@@ -28,6 +74,12 @@ function Candidatures() {
   const [modalError, setModalError] = useState('')
   const [rowLoading, setRowLoading] = useState({})
   const [rowMessages, setRowMessages] = useState({})
+  const [documentLoading, setDocumentLoading] = useState({})
+  const [documentErrors, setDocumentErrors] = useState({})
+  const [notificationLoading, setNotificationLoading] = useState({})
+  const [notificationMessage, setNotificationMessage] = useState(null)
+  const [watched, setWatched] = useState([])
+  const pollAttempts = useRef({})
   const [createdStudents, setCreatedStudents] = useState({})
   const [createdAccount, setCreatedAccount] = useState(null)
   const [options, setOptions] = useState({ filieres: [], annees: [] })
@@ -85,6 +137,48 @@ function Candidatures() {
     loadStudents()
   }, [loadCandidatures, loadStudents])
 
+  const watchNotifications = useCallback((candidatureId) => {
+    pollAttempts.current[candidatureId] = 0
+    setWatched((current) => (current.includes(candidatureId) ? current : [...current, candidatureId]))
+  }, [])
+
+  // Suit les dossiers dont une notification est encore « en cours » (voir PENDING_NOTIFICATIONS)
+  useEffect(() => {
+    if (!watched.length) return undefined
+    const timer = window.setInterval(async () => {
+      const finished = []
+      for (const candidatureId of watched) {
+        pollAttempts.current[candidatureId] = (pollAttempts.current[candidatureId] ?? 0) + 1
+        const gaveUp = pollAttempts.current[candidatureId] >= NOTIFICATION_POLL_MAX_ATTEMPTS
+        try {
+          const { data } = await api.get(`/candidatures/${candidatureId}`)
+          setSelectedCandidature((current) =>
+            current?.id === candidatureId ? { ...current, ...data } : current,
+          )
+          if (!hasPendingNotification(data)) {
+            const status = notificationStatus(data.notifications?.[0])
+            setRowMessages((current) => ({
+              ...current,
+              [candidatureId]: {
+                type: status === 'ECHEC' ? 'error' : 'success',
+                text: notificationStatusMessage(status),
+              },
+            }))
+            finished.push(candidatureId)
+            continue
+          }
+        } catch {
+          // erreur passagère : on réessaie au prochain passage
+        }
+        if (gaveUp) finished.push(candidatureId)
+      }
+      if (finished.length) {
+        setWatched((current) => current.filter((id) => !finished.includes(id)))
+      }
+    }, NOTIFICATION_POLL_MS)
+    return () => window.clearInterval(timer)
+  }, [watched])
+
   const filteredCandidatures = useMemo(() => {
     const normalizedSearch = search.trim().toLocaleLowerCase('fr')
     return candidatures.filter((candidature) => {
@@ -113,6 +207,7 @@ function Candidatures() {
     try {
       const { data } = await api.get(`/candidatures/${candidature.id}`)
       setSelectedCandidature({ ...candidature, ...data })
+      if (hasPendingNotification(data)) watchNotifications(candidature.id)
     } catch (requestError) {
       setModalError(
         getErrorMessage(requestError, 'Impossible de charger les détails du dossier.'),
@@ -134,40 +229,113 @@ function Candidatures() {
     setModalLoading(true)
     setModalError('')
     try {
-      await api.patch(`/candidatures/${selectedCandidature.id}/statut`, {
+      const { data } = await api.patch(`/candidatures/${selectedCandidature.id}/statut`, {
         statut,
         ...(commentaire.trim() ? { commentaire: commentaire.trim() } : {}),
       })
+      const candidatureId = selectedCandidature.id
+      const deliveryStatus = notificationStatus(data?.notification)
       setModal(null)
       setSelectedCandidature(null)
       await loadCandidatures()
       await loadStudents()
+      setRowMessages((current) => ({
+        ...current,
+        [candidatureId]: {
+          type: deliveryStatus === 'ECHEC' ? 'error' : 'success',
+          text: notificationStatusMessage(deliveryStatus),
+        },
+      }))
+      if (isPending(deliveryStatus)) watchNotifications(candidatureId)
     } catch (requestError) {
-      setModalError(getErrorMessage(requestError, 'Le statut n’a pas pu être modifié.'))
+      setModalError(
+        `Le statut n’a pas été modifié. ${getErrorMessage(
+          requestError,
+          'Veuillez réessayer.',
+        )}`,
+      )
     } finally {
       setModalLoading(false)
     }
   }
 
-  const createStudent = async (candidature) => {
-    if (!user?.tenantId) {
-      setRowMessages((current) => ({
-        ...current,
-        [candidature.id]: {
-          type: 'error',
-          text: 'Le tenant de votre compte est introuvable. Reconnectez-vous.',
-        },
-      }))
-      return
-    }
+  const openDocument = async (document) => {
+    const candidatureId = selectedCandidature?.id
+    if (!candidatureId) return
 
+    // Ouvre la fenêtre dans le geste utilisateur pour éviter son blocage après l'appel API.
+    const previewWindow = window.open('', '_blank')
+    if (previewWindow) previewWindow.opener = null
+    setDocumentErrors((current) => ({ ...current, [document.id]: '' }))
+    setDocumentLoading((current) => ({ ...current, [document.id]: true }))
+    try {
+      const blob = await fetchCandidatureDocument(candidatureId, document.id)
+      const objectUrl = URL.createObjectURL(blob)
+      if (previewWindow) {
+        previewWindow.location.replace(objectUrl)
+      } else {
+        const link = window.document.createElement('a')
+        link.href = objectUrl
+        link.download = safeDocumentName(document.nomFichier, document.id)
+        link.rel = 'noopener'
+        window.document.body.appendChild(link)
+        link.click()
+        link.remove()
+      }
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000)
+    } catch (requestError) {
+      previewWindow?.close()
+      setDocumentErrors((current) => ({
+        ...current,
+        [document.id]: getErrorMessage(
+          requestError,
+          'Impossible d’ouvrir ce document. Vérifiez vos droits puis réessayez.',
+        ),
+      }))
+    } finally {
+      setDocumentLoading((current) => ({ ...current, [document.id]: false }))
+    }
+  }
+
+  const retryNotification = async (notification) => {
+    const candidatureId = selectedCandidature?.id
+    if (!candidatureId) return
+    setNotificationLoading((current) => ({ ...current, [notification.id]: true }))
+    setNotificationMessage(null)
+    try {
+      const result = await retryCandidatureNotification(candidatureId, notification.id)
+      const updatedNotification = result?.notification ?? result
+      const status = notificationStatus(updatedNotification)
+      setSelectedCandidature((current) => ({
+        ...current,
+        notifications: current.notifications.map((item) =>
+          item.id === notification.id ? { ...item, ...updatedNotification } : item,
+        ),
+      }))
+      setNotificationMessage({
+        type: status === 'ECHEC' ? 'error' : 'success',
+        text: notificationStatusMessage(status, true),
+      })
+      if (isPending(status)) watchNotifications(candidatureId)
+    } catch (requestError) {
+      setNotificationMessage({
+        type: 'error',
+        text: `Le nouvel envoi n’a pas pu être lancé. ${getErrorMessage(
+          requestError,
+          'Veuillez réessayer.',
+        )}`,
+      })
+    } finally {
+      setNotificationLoading((current) => ({ ...current, [notification.id]: false }))
+    }
+  }
+
+  const createStudent = async (candidature) => {
     setRowLoading((current) => ({ ...current, [candidature.id]: true }))
     setRowMessages((current) => ({ ...current, [candidature.id]: null }))
     try {
-      const { data } = await api.post('/etudiants', {
-        candidatureId: candidature.id,
-        tenantId: user.tenantId,
-      })
+      // L'établissement vient du JWT côté serveur : seul l'identifiant de la candidature est envoyé
+      const { data } = await api.post('/etudiants', { candidatureId: candidature.id })
       // Le mot de passe temporaire n'est gardé que dans l'alerte, pas dans les listes
       const { motDePasseTemporaire, ...student } = data
       setCreatedStudents((current) => ({ ...current, [candidature.id]: student }))
@@ -581,12 +749,89 @@ function Candidatures() {
                   <h3 className="text-sm font-bold text-slate-800">Documents</h3>
                   <ul className="mt-2 space-y-2">
                     {selectedCandidature.documents.map((document) => (
-                      <li className="text-sm text-slate-600" key={document.id}>
-                        {document.typeDocument} — {document.nomFichier}
-                        {document.valide ? ' · Validé' : ' · À vérifier'}
+                      <li className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-50 p-3 text-sm text-slate-600" key={document.id}>
+                        <span className="min-w-0 break-words">
+                          {document.typeDocument} — {document.nomFichier}
+                          {document.valide ? ' · Validé' : ' · À vérifier'}
+                        </span>
+                        <button
+                          className="shrink-0 rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5 disabled:cursor-not-allowed disabled:opacity-60"
+                          disabled={documentLoading[document.id]}
+                          onClick={() => openDocument(document)}
+                          type="button"
+                        >
+                          {documentLoading[document.id] ? 'Chargement…' : 'Ouvrir / télécharger'}
+                        </button>
+                        {documentErrors[document.id] && (
+                          <p className="w-full text-xs text-red-700" role="alert">
+                            {documentErrors[document.id]}
+                          </p>
+                        )}
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+              {selectedCandidature.notifications?.length > 0 && (
+                <div className="mt-6 border-t border-slate-100 pt-5">
+                  <h3 className="text-sm font-bold text-slate-800">Notifications par e-mail</h3>
+                  <ul className="mt-2 space-y-3">
+                    {selectedCandidature.notifications.map((notification) => {
+                      const status = notificationStatus(notification)
+                      return (
+                        <li
+                          className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-slate-50 p-3"
+                          key={notification.id}
+                        >
+                          <div className="text-sm text-slate-600">
+                            <p className="font-semibold text-slate-800">
+                              {notificationLabels[status] ?? status ?? 'État inconnu'}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              Créée le {formatDate(notification.createdAt)}
+                              {notification.envoyeLe
+                                ? ` · Envoyée le ${formatDate(notification.envoyeLe)}`
+                                : ''}
+                            </p>
+                            {status === 'ECHEC' && (
+                              <p className="mt-1 text-xs text-amber-800">
+                                L’envoi a échoué. Vous pouvez relancer le courriel.
+                              </p>
+                            )}
+                          </div>
+                          {status === 'ECHEC' && notification.peutRelancer && (
+                            <button
+                              className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5 disabled:cursor-not-allowed disabled:opacity-60"
+                              disabled={notificationLoading[notification.id]}
+                              onClick={() => retryNotification(notification)}
+                              type="button"
+                            >
+                              {notificationLoading[notification.id]
+                                ? 'Relance…'
+                                : 'Relancer l’envoi'}
+                            </button>
+                          )}
+                          {status === 'ECHEC' && !notification.peutRelancer && (
+                            <p className="text-xs text-slate-500">
+                              Cette notification ne peut plus être relancée.
+                            </p>
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  {notificationMessage && (
+                    <p
+                      className={`mt-3 rounded-xl p-3 text-sm ${
+                        notificationMessage.type === 'error'
+                          ? 'bg-red-50 text-red-700'
+                          : 'bg-emerald-50 text-emerald-800'
+                      }`}
+                      role={notificationMessage.type === 'error' ? 'alert' : 'status'}
+                    >
+                      {notificationMessage.text}
+                    </p>
+                  )}
                 </div>
               )}
               {selectedCandidature.historiques?.length > 0 && (
