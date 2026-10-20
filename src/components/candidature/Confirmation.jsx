@@ -4,7 +4,7 @@ import PropTypes from 'prop-types'
 import DocumentsUploader from './DocumentsUploader'
 
 /** Étape finale : numéro de dossier à conserver, puis envoi (facultatif) des documents. */
-function Confirmation({ dossier, onNouvelle, titleRef }) {
+function Confirmation({ dossier, notification, onNouvelle, titleRef }) {
   const [copie, setCopie] = useState(false)
 
   const copier = async () => {
@@ -23,6 +23,15 @@ function Confirmation({ dossier, onNouvelle, titleRef }) {
         <h2 className="text-xl font-bold text-emerald-900 outline-none" ref={titleRef} tabIndex={-1}>
           Votre candidature est enregistrée
         </h2>
+        {notification?.statut === 'ECHEC' && (
+          <p
+            className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm font-semibold text-amber-900"
+            role="status"
+          >
+            Votre candidature a bien été enregistrée, mais le courriel de confirmation n’a pas pu
+            être envoyé. Conservez votre numéro de dossier pour suivre votre candidature.
+          </p>
+        )}
         <p className="mt-3 text-sm text-emerald-900">Votre numéro de dossier :</p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
           <code className="select-all rounded-lg bg-white px-4 py-2 font-mono text-xl font-bold tracking-wider text-iuc-blue ring-1 ring-emerald-200">
@@ -94,6 +103,9 @@ Confirmation.propTypes = {
     email: PropTypes.string.isRequired,
     piecesRequises: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
+  notification: PropTypes.shape({
+    statut: PropTypes.string,
+  }),
   onNouvelle: PropTypes.func.isRequired,
   titleRef: PropTypes.object,
 }

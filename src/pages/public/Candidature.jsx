@@ -148,6 +148,7 @@ function Candidature() {
         numeroDossier: creee.numeroDossier,
         email,
         piecesRequises: filiere.piecesRequises,
+        notification: creee.notification,
       }
       ecrireDossier(cree)
       setDossier(cree)
@@ -192,7 +193,12 @@ function Candidature() {
 
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
         {etape === ETAPE_CONFIRMATION && dossier ? (
-          <Confirmation dossier={dossier} onNouvelle={nouvelle} titleRef={titreRef} />
+          <Confirmation
+            dossier={dossier}
+            notification={dossier.notification}
+            onNouvelle={nouvelle}
+            titleRef={titreRef}
+          />
         ) : (
           <form noValidate onSubmit={onSubmit}>
             <h2 className="mb-5 text-lg font-bold text-iuc-blue outline-none" ref={titreRef} tabIndex={-1}>
