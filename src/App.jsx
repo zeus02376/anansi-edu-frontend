@@ -12,7 +12,9 @@ import Suivi from './pages/public/Suivi'
 import ChangerMotDePasse from './pages/auth/ChangerMotDePasse'
 import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
+import Etudiants from './pages/etudiants/Etudiants'
 import Candidatures from './pages/scolarite/Candidatures'
+import Inscriptions from './pages/scolarite/Inscriptions'
 import ScolariteDashboard from './pages/scolarite/Dashboard'
 import NotesEvaluation from './pages/scolarite/NotesEvaluation'
 import NotesEvaluations from './pages/scolarite/NotesEvaluations'
@@ -68,7 +70,7 @@ function App() {
           path="/admin/enseignants"
           element={<ModulePlaceholder title="Enseignants" />}
         />
-        <Route path="/admin/etudiants" element={<ModulePlaceholder title="Étudiants" />} />
+        <Route path="/admin/etudiants" element={<Etudiants />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['SCOLARITE', 'ADMIN']} />}>
@@ -77,14 +79,8 @@ function App() {
         <Route path="/scolarite/notes" element={<NotesEvaluations />} />
         <Route path="/scolarite/notes/releve" element={<ReleveNotes />} />
         <Route path="/scolarite/evaluations/:id" element={<NotesEvaluation />} />
-        <Route
-          path="/scolarite/etudiants"
-          element={<ModulePlaceholder title="Étudiants" />}
-        />
-        <Route
-          path="/scolarite/inscriptions"
-          element={<ModulePlaceholder title="Inscriptions" />}
-        />
+        <Route path="/scolarite/etudiants" element={<Etudiants />} />
+        <Route path="/scolarite/inscriptions" element={<Inscriptions />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['ENSEIGNANT']} />}>
