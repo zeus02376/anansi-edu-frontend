@@ -14,6 +14,9 @@ import Comptes from './pages/admin/Comptes'
 import AdminDashboard from './pages/admin/Dashboard'
 import Candidatures from './pages/scolarite/Candidatures'
 import ScolariteDashboard from './pages/scolarite/Dashboard'
+import NotesEvaluation from './pages/scolarite/NotesEvaluation'
+import NotesEvaluations from './pages/scolarite/NotesEvaluations'
+import ReleveNotes from './pages/scolarite/Releve'
 import EnseignantDashboard from './pages/enseignant/Dashboard'
 import EnseignantMatieres from './pages/enseignant/Matieres'
 import EtudiantDashboard from './pages/etudiant/Dashboard'
@@ -71,6 +74,9 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={['SCOLARITE', 'ADMIN']} />}>
         <Route path="/scolarite" element={<ScolariteDashboard />} />
         <Route path="/scolarite/candidatures" element={<Candidatures />} />
+        <Route path="/scolarite/notes" element={<NotesEvaluations />} />
+        <Route path="/scolarite/notes/releve" element={<ReleveNotes />} />
+        <Route path="/scolarite/evaluations/:id" element={<NotesEvaluation />} />
         <Route
           path="/scolarite/etudiants"
           element={<ModulePlaceholder title="Étudiants" />}
