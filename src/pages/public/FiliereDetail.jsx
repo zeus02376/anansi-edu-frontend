@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import { MessagePage, SqueletteDetail } from '../../components/public/EtatPage'
 import { fetchFiliere } from '../../services/catalogue'
 import {
   cycleLabels,
@@ -26,20 +27,6 @@ function Fact({ label, children }) {
 }
 
 Fact.propTypes = { label: PropTypes.string.isRequired, children: PropTypes.node }
-
-function Message({ title, children }) {
-  return (
-    <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-8">
-      <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
-      <div className="mt-3 text-sm text-slate-500">{children}</div>
-      <Link className="mt-6 inline-block text-sm font-bold text-iuc-blue underline" to="/filieres">
-        ← Retour aux filières
-      </Link>
-    </div>
-  )
-}
-
-Message.propTypes = { title: PropTypes.string.isRequired, children: PropTypes.node }
 
 function FiliereDetail() {
   const { id } = useParams()
@@ -67,14 +54,14 @@ function FiliereDetail() {
 
   if (error?.notFound) {
     return (
-      <Message title="Filière introuvable">
+      <MessagePage title="Filière introuvable">
         Cette filière n’existe pas ou n’est plus proposée.
-      </Message>
+      </MessagePage>
     )
   }
   if (error) {
     return (
-      <Message title="Chargement impossible">
+      <MessagePage title="Chargement impossible">
         <p role="alert">{error.message}</p>
         <button
           className="mt-3 font-bold text-iuc-blue underline"
@@ -83,19 +70,10 @@ function FiliereDetail() {
         >
           Réessayer
         </button>
-      </Message>
+      </MessagePage>
     )
   }
-  if (!filiere) {
-    return (
-      <div className="mx-auto max-w-6xl animate-pulse px-4 py-12 sm:px-8" role="status">
-        <span className="sr-only">Chargement de la filière…</span>
-        <div className="h-5 w-32 rounded bg-slate-200" />
-        <div className="mt-4 h-9 w-2/3 rounded bg-slate-200" />
-        <div className="mt-8 h-64 rounded-2xl bg-white" />
-      </div>
-    )
-  }
+  if (!filiere) return <SqueletteDetail label="Chargement de la filière…" />
 
   const { ecole } = filiere
   const accent = ecoleAccent(ecole)
@@ -188,7 +166,12 @@ function FiliereDetail() {
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-bold text-iuc-blue">L’école et le campus</h2>
             <p className={`mt-4 text-sm font-semibold ${accent.text || 'text-slate-800'}`}>
-              {ecole.nom}
+              <Link
+                className="rounded underline-offset-2 hover:underline focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-blue/20"
+                to={`/ecoles/${ecole.id}`}
+              >
+                {ecole.nom}
+              </Link>
             </p>
             {ecole.description && (
               <p className="mt-1 text-sm leading-6 text-slate-500">{ecole.description}</p>
