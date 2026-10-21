@@ -22,6 +22,8 @@ export const fetchToutesLesFilieres = (signal) => getPublic('/filieres', { signa
 
 export const fetchFiliere = (id, signal) => getPublic(`/filieres/${id}`, { signal })
 
+export const fetchEcole = (id, signal) => getPublic(`/ecoles/${id}`, { signal })
+
 export const fetchCampus = (signal) => getPublic('/campus', { signal })
 
 export const fetchEcoles = (signal) => getPublic('/ecoles', { signal })

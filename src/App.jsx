@@ -6,6 +6,7 @@ import PublicLayout from './components/PublicLayout'
 import Login from './pages/auth/Login'
 import Accueil from './pages/public/Accueil'
 import Candidature from './pages/public/Candidature'
+import EcolePresentation from './pages/public/EcolePresentation'
 import FiliereDetail from './pages/public/FiliereDetail'
 import Filieres from './pages/public/Filieres'
 import Suivi from './pages/public/Suivi'
@@ -55,6 +56,7 @@ function App() {
         <Route path="/" element={<Accueil />} />
         <Route path="/filieres" element={<Filieres />} />
         <Route path="/filieres/:id" element={<FiliereDetail />} />
+        <Route path="/ecoles/:id" element={<EcolePresentation />} />
         <Route path="/candidature" element={<Candidature />} />
         <Route path="/suivi" element={<Suivi />} />
       </Route>
