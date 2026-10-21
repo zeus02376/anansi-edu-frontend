@@ -124,3 +124,35 @@ export const messagesCodesLigne = {
   VALEUR_INVALIDE: 'Valeur invalide',
   CONFLIT: 'Note modifiée ailleurs depuis votre chargement',
 }
+
+// ---------- Personnel (scolarité, administration) ----------
+
+/** Contenu d'une note pour l'affichage (« 12 », « Absent », « Dispensé », « — »). */
+export function libelleNote(etat, valeur) {
+  if (!etat) return '—'
+  if (etat === 'NOTEE') return formatNombre(valeur)
+  return etatNoteLabels[etat] ?? etat
+}
+
+export const actionPublicationLabels = {
+  PUBLICATION: 'Publiée',
+  DEPUBLICATION: 'Dépubliée',
+}
+
+export const statutInscriptionLabels = {
+  EN_ATTENTE: 'Inscription en attente',
+  VALIDE: 'Inscription validée',
+  REJETE: 'Inscription rejetée',
+  SUSPENDU: 'Inscription suspendue',
+}
+
+/** Date et heure au format français court (« 21/10/2026 14:05 »), « — » si invalide. */
+export function formatDateHeure(valeur) {
+  const date = new Date(valeur)
+  return Number.isNaN(date.getTime())
+    ? '—'
+    : new Intl.DateTimeFormat('fr-FR', { dateStyle: 'short', timeStyle: 'short' }).format(date)
+}
+
+/** Nom complet d'un auteur renvoyé par l'API ({ nom, prenom }), « — » s'il est inconnu. */
+export const nomAuteur = (auteur) => (auteur ? [auteur.prenom, auteur.nom].filter(Boolean).join(' ') : '—')

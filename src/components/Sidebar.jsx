@@ -7,6 +7,8 @@ const navigationByRole = {
   ADMIN: [
     { label: 'Tableau de bord', to: '/admin', icon: '⌂' },
     { label: 'Candidatures', to: '/scolarite/candidatures', icon: '▣' },
+    { label: 'Notes', to: '/scolarite/notes', icon: '✎' },
+    { label: 'Relevés de notes', to: '/scolarite/notes/releve', icon: '☰' },
     { label: 'Comptes', to: '/admin/comptes', icon: '☺' },
     { label: 'Tenants', to: '/admin/tenants', icon: '◫' },
     { label: 'Écoles', to: '/admin/ecoles', icon: '▤' },
@@ -19,6 +21,8 @@ const navigationByRole = {
     { label: 'Candidatures', to: '/scolarite/candidatures', icon: '▣' },
     { label: 'Étudiants', to: '/scolarite/etudiants', icon: '♧' },
     { label: 'Inscriptions', to: '/scolarite/inscriptions', icon: '☷' },
+    { label: 'Notes', to: '/scolarite/notes', icon: '✎' },
+    { label: 'Relevés de notes', to: '/scolarite/notes/releve', icon: '☰' },
   ],
   ENSEIGNANT: [
     { label: 'Tableau de bord', to: '/enseignant', icon: '⌂' },
