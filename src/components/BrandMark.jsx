@@ -1,9 +1,5 @@
 import PropTypes from 'prop-types'
-
-// Logo IUC : src/assets/logos/iuc.png. Chargé par glob pour que l'application compile et
-// s'affiche (avec le monogramme de repli) tant que le fichier n'a pas été ajouté au dépôt.
-const logos = import.meta.glob('../assets/logos/iuc.png', { eager: true, import: 'default' })
-const logoIuc = Object.values(logos)[0]
+import { logoIuc } from '../utils/logos'
 
 /** Logo + nom de la plateforme, pour les fonds de couleur (en-tête, pied de page). */
 function BrandMark({ subtitle, className = '', logoSrc = logoIuc }) {
