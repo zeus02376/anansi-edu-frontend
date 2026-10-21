@@ -18,6 +18,8 @@ import EnseignantDashboard from './pages/enseignant/Dashboard'
 import EnseignantMatieres from './pages/enseignant/Matieres'
 import EtudiantDashboard from './pages/etudiant/Dashboard'
 import EtudiantDossier from './pages/etudiant/Dossier'
+import EtudiantNotes from './pages/etudiant/Notes'
+import EnseignantEvaluation from './pages/enseignant/Evaluation'
 import { CHANGE_PASSWORD_PATH } from './utils/dashboard'
 
 function ModulePlaceholder({ title }) {
@@ -82,11 +84,13 @@ function App() {
       <Route element={<ProtectedRoute allowedRoles={['ENSEIGNANT']} />}>
         <Route path="/enseignant" element={<EnseignantDashboard />} />
         <Route path="/enseignant/matieres" element={<EnseignantMatieres />} />
+        <Route path="/enseignant/evaluations/:id" element={<EnseignantEvaluation />} />
       </Route>
 
       <Route element={<ProtectedRoute allowedRoles={['ETUDIANT']} />}>
         <Route path="/etudiant" element={<EtudiantDashboard />} />
         <Route path="/etudiant/dossier" element={<EtudiantDossier />} />
+        <Route path="/etudiant/notes" element={<EtudiantNotes />} />
       </Route>
 
       <Route element={<ProtectedRoute />}>

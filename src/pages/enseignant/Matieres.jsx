@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import DashboardLayout from '../../components/DashboardLayout'
+import EvaluationsMatiere from '../../components/notes/EvaluationsMatiere'
 import { Carte, Etat } from '../../components/ui/Etat'
 import { fetchMesAffectations } from '../../services/moi'
 import { useRessource } from '../../utils/useRessource'
@@ -16,6 +18,8 @@ const volumes = (matiere) =>
 function Matieres() {
   usePageTitle('Mes matières')
   const { data, loading, error, recharger } = useRessource(fetchMesAffectations)
+  // Matière dont les évaluations sont dépliées (chargées à l'ouverture)
+  const [ouverte, setOuverte] = useState(null)
 
   return (
     <DashboardLayout>
@@ -36,7 +40,8 @@ function Matieres() {
           {data && (
             <ul className="divide-y divide-slate-100">
               {data.map((affectation) => (
-                <li className="flex flex-wrap items-center justify-between gap-3 py-3" key={affectation.id}>
+                <li className="py-3" key={affectation.id}>
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <p className="font-semibold text-slate-900">
                       {affectation.matiere?.nom}
@@ -55,6 +60,18 @@ function Matieres() {
                       <p className="text-slate-500">{affectation.heuresPrevues} h prévues</p>
                     )}
                   </div>
+                  </div>
+                  <button
+                    aria-expanded={ouverte === affectation.matiere?.id}
+                    className="mt-3 text-sm font-semibold text-iuc-blue underline"
+                    onClick={() =>
+                      setOuverte((courante) => (courante === affectation.matiere?.id ? null : affectation.matiere?.id))
+                    }
+                    type="button"
+                  >
+                    {ouverte === affectation.matiere?.id ? 'Masquer les évaluations' : 'Évaluations et notes'}
+                  </button>
+                  {ouverte === affectation.matiere?.id && <EvaluationsMatiere matiereId={affectation.matiere.id} />}
                 </li>
               ))}
             </ul>
