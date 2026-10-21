@@ -27,6 +27,7 @@ const navigationByRole = {
   ETUDIANT: [
     { label: 'Tableau de bord', to: '/etudiant', icon: '⌂' },
     { label: 'Mon dossier', to: '/etudiant/dossier', icon: '▣' },
+    { label: 'Mes notes', to: '/etudiant/notes', icon: '✎' },
     { label: 'Changer mon mot de passe', to: CHANGE_PASSWORD_PATH, icon: '⚿' },
   ],
 }
