@@ -64,7 +64,7 @@ function FiliereDetail() {
       <MessagePage title="Chargement impossible">
         <p role="alert">{error.message}</p>
         <button
-          className="mt-3 font-bold text-iuc-blue underline"
+          className="mt-3 font-bold text-iuc-red underline"
           onClick={() => setAttempt((count) => count + 1)}
           type="button"
         >
@@ -85,14 +85,14 @@ function FiliereDetail() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-8">
           <nav aria-label="Fil d’Ariane" className="text-sm text-slate-400">
-            <Link className="hover:text-iuc-blue" to="/filieres">
+            <Link className="hover:text-iuc-red" to="/filieres">
               Filières
             </Link>
             <span aria-hidden="true"> › </span>
             <span className="text-slate-600">{filiere.nom}</span>
           </nav>
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-iuc-blue/10 px-2.5 py-1 text-xs font-bold text-iuc-blue">
+            <span className="rounded-full bg-iuc-red/10 px-2.5 py-1 text-xs font-bold text-iuc-red">
               {cycleLabels[filiere.cycle] ?? filiere.cycle}
             </span>
             {filiere.langue && (
@@ -124,7 +124,7 @@ function FiliereDetail() {
           )}
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-iuc-blue">La formation</h2>
+            <h2 className="text-lg font-bold text-iuc-red">La formation</h2>
             <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
               <Fact label="Code">{filiere.code}</Fact>
               <Fact label="Durée">{formatDuree(filiere.dureeAnnees)}</Fact>
@@ -136,7 +136,7 @@ function FiliereDetail() {
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-iuc-blue">Admission</h2>
+            <h2 className="text-lg font-bold text-iuc-red">Admission</h2>
             <dl className="mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-2">
               <Fact label="Niveau d’entrée">{filiere.niveauEntree}</Fact>
               <Fact label="Diplôme requis">{filiere.diplomeRequis}</Fact>
@@ -151,7 +151,7 @@ function FiliereDetail() {
               <ul className="mt-2 space-y-1.5">
                 {filiere.piecesRequises.map((piece) => (
                   <li className="flex items-start gap-2 text-sm text-slate-700" key={piece}>
-                    <span aria-hidden="true" className="font-bold text-iuc-gold">
+                    <span aria-hidden="true" className="font-bold text-iuc-green">
                       ✓
                     </span>
                     {piece}
@@ -164,10 +164,10 @@ function FiliereDetail() {
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-iuc-blue">L’école et le campus</h2>
+            <h2 className="text-lg font-bold text-iuc-red">L’école et le campus</h2>
             <p className={`mt-4 text-sm font-semibold ${accent.text || 'text-slate-800'}`}>
               <Link
-                className="rounded underline-offset-2 hover:underline focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-blue/20"
+                className="rounded underline-offset-2 hover:underline focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-red/20"
                 to={`/ecoles/${ecole.id}`}
               >
                 {ecole.nom}
@@ -187,19 +187,19 @@ function FiliereDetail() {
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-iuc-blue">Frais de candidature</h2>
+            <h2 className="text-lg font-bold text-iuc-red">Frais de candidature</h2>
             <dl className="mt-4 space-y-3">
               <Fact label="Candidats nationaux">{national}</Fact>
               <Fact label="Candidats étrangers">{etranger}</Fact>
             </dl>
             <Link
-              className="mt-6 flex w-full justify-center rounded-xl bg-iuc-blue px-4 py-3 text-sm font-bold text-white transition hover:bg-iuc-blue/90 focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-blue/20"
+              className="mt-6 flex w-full justify-center rounded-xl bg-iuc-red px-4 py-3 text-sm font-bold text-white transition hover:bg-iuc-red/90 focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-red/20"
               to={`/candidature?filiere=${filiere.id}`}
             >
               Candidater à cette filière
             </Link>
             <Link
-              className="mt-3 block text-center text-sm font-semibold text-slate-500 hover:text-iuc-blue"
+              className="mt-3 block text-center text-sm font-semibold text-slate-500 hover:text-iuc-red"
               to="/filieres"
             >
               ← Toutes les filières

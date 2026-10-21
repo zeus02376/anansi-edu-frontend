@@ -29,10 +29,10 @@ function FiliereCard({ filiere }) {
 
   return (
     <article
-      className={`relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-iuc-blue/30 hover:shadow-md ${accent.border}`}
+      className={`relative flex flex-col rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-iuc-red/30 hover:shadow-md ${accent.border}`}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-iuc-blue/10 px-2.5 py-1 text-xs font-bold text-iuc-blue">
+        <span className="rounded-full bg-iuc-red/10 px-2.5 py-1 text-xs font-bold text-iuc-red">
           {cycleLabels[filiere.cycle] ?? filiere.cycle}
         </span>
         {filiere.langue && (
@@ -52,7 +52,7 @@ function FiliereCard({ filiere }) {
 
       <h3 className="mt-3 text-lg font-bold leading-snug text-slate-900">
         <Link
-          className="rounded after:absolute after:inset-0 hover:text-iuc-blue focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-blue/20"
+          className="rounded after:absolute after:inset-0 hover:text-iuc-red focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-red/20"
           to={`/filieres/${filiere.id}`}
         >
           {filiere.nom}
@@ -78,7 +78,7 @@ function FiliereCard({ filiere }) {
         </Info>
       </dl>
 
-      <span className="mt-auto pt-5 text-sm font-bold text-iuc-blue">Voir le détail →</span>
+      <span className="mt-auto pt-5 text-sm font-bold text-iuc-red">Voir le détail →</span>
     </article>
   )
 }

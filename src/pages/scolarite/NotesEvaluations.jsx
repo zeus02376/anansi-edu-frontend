@@ -55,12 +55,12 @@ function NotesEvaluations() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Espace scolarité</p>
+        <p className="text-sm font-semibold text-iuc-red">Espace scolarité</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Notes</h1>
         <p className="mt-2 text-sm text-slate-500">
           Évaluations de l’établissement, publiées ou en brouillon : consultez les notes, corrigez-les, publiez ou
           dépubliez.{' '}
-          <Link className="font-semibold text-iuc-blue underline" to="/scolarite/notes/releve">
+          <Link className="font-semibold text-iuc-red underline" to="/scolarite/notes/releve">
             Relevé d’un étudiant →
           </Link>
         </p>
@@ -159,7 +159,7 @@ function NotesEvaluations() {
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <Link
-                          className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue hover:bg-iuc-blue/5"
+                          className="rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red hover:bg-iuc-red/5"
                           to={`/scolarite/evaluations/${evaluation.id}`}
                         >
                           Voir les notes

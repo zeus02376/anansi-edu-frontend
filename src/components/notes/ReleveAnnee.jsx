@@ -49,7 +49,7 @@ function Matiere({ matiere, commentaires }) {
           <span className="text-slate-500">
             {nb === 0 ? 'Aucune évaluation publiée' : `${nb} évaluation${nb > 1 ? 's' : ''}`}
           </span>
-          <span className="rounded-lg bg-iuc-blue/10 px-2.5 py-1 font-bold text-iuc-blue">
+          <span className="rounded-lg bg-iuc-red/10 px-2.5 py-1 font-bold text-iuc-red">
             {matiere.moyenne === null ? '—' : `${formatNombre(matiere.moyenne)} / 20`}
           </span>
           <span aria-hidden="true" className="text-slate-400 transition group-open:rotate-90">
@@ -110,7 +110,7 @@ function ReleveAnnee({ annee, provisoire = annee.provisoire, commentaires = fals
               Pas encore de moyenne générale : aucune note publiée n’entre dans le calcul.
             </p>
           ) : (
-            <p className="text-3xl font-black text-iuc-blue" data-testid="moyenne-generale">
+            <p className="text-3xl font-black text-iuc-red" data-testid="moyenne-generale">
               {formatNombre(annee.moyenneGenerale)}
               <span className="text-lg font-semibold text-slate-400"> / 20</span>
             </p>

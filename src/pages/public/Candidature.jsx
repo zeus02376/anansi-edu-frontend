@@ -179,7 +179,7 @@ function Candidature() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8">
-      <p className="text-sm font-semibold text-iuc-blue">Candidature en ligne</p>
+      <p className="text-sm font-semibold text-iuc-red">Candidature en ligne</p>
       <h1 className="mt-2 text-3xl font-bold text-slate-900">Déposer ma candidature</h1>
 
       <div className="mt-8">
@@ -201,7 +201,7 @@ function Candidature() {
           />
         ) : (
           <form noValidate onSubmit={onSubmit}>
-            <h2 className="mb-5 text-lg font-bold text-iuc-blue outline-none" ref={titreRef} tabIndex={-1}>
+            <h2 className="mb-5 text-lg font-bold text-iuc-red outline-none" ref={titreRef} tabIndex={-1}>
               {TITRES[etape]}
             </h2>
 
@@ -269,7 +269,7 @@ function Candidature() {
                 <span />
               )}
               <button
-                className="rounded-xl bg-iuc-blue px-6 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-iuc-red px-6 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={envoi || bloque}
                 type="submit"
               >

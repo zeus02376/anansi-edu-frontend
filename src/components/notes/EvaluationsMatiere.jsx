@@ -117,7 +117,7 @@ function EvaluationForm({ evaluation, onClose, onSaved, matiereId }) {
             Annuler
           </button>
           <button
-            className="rounded-xl bg-iuc-blue px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:opacity-60"
+            className="rounded-xl bg-iuc-red px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:opacity-60"
             disabled={isSubmitting}
             type="submit"
           >
@@ -156,7 +156,7 @@ function Confirmation({ titre, message, confirmer, danger, onConfirm, onClose, e
         </button>
         <button
           className={`rounded-xl px-5 py-2.5 text-sm font-bold text-white transition disabled:opacity-60 ${
-            danger ? 'bg-red-600 hover:bg-red-700' : 'bg-iuc-blue hover:bg-iuc-blue/90'
+            danger ? 'bg-red-600 hover:bg-red-700' : 'bg-iuc-red hover:bg-iuc-red/90'
           }`}
           disabled={occupe}
           onClick={onConfirm}
@@ -214,7 +214,7 @@ function EvaluationsMatiere({ matiereId }) {
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-bold text-slate-800">Évaluations</h3>
         <button
-          className="rounded-lg bg-iuc-blue px-3 py-2 text-xs font-bold text-white transition hover:bg-iuc-blue/90"
+          className="rounded-lg bg-iuc-red px-3 py-2 text-xs font-bold text-white transition hover:bg-iuc-red/90"
           onClick={() => setDialogue({ type: 'form' })}
           type="button"
         >
@@ -272,7 +272,7 @@ function EvaluationsMatiere({ matiereId }) {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                   <Link
-                    className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue hover:bg-iuc-blue/5"
+                    className="rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red hover:bg-iuc-red/5"
                     to={`/enseignant/evaluations/${evaluation.id}`}
                   >
                     {brouillon ? 'Saisir les notes' : 'Voir les notes'}

@@ -182,14 +182,14 @@ function Inscriptions() {
     <DashboardLayout>
       <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-semibold text-iuc-blue">Gestion académique</p>
+          <p className="text-sm font-semibold text-iuc-red">Gestion académique</p>
           <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Inscriptions</h1>
           <p className="mt-2 text-sm text-slate-500">
             Affectez les étudiants à un niveau pour une année académique.
           </p>
         </div>
         <button
-          className="inline-flex items-center justify-center rounded-xl bg-iuc-blue px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-blue/90"
+          className="inline-flex items-center justify-center rounded-xl bg-iuc-red px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-red/90"
           onClick={openCreate}
           type="button"
         >
@@ -295,7 +295,7 @@ function Inscriptions() {
                       </td>
                       <td className="px-4 py-4">
                         <button
-                          className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5"
+                          className="rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red transition hover:bg-iuc-red/5"
                           onClick={() => openEdit(inscription)}
                           type="button"
                         >
@@ -331,7 +331,7 @@ function Inscriptions() {
                 {optionsError}
               </p>
               <button
-                className="text-sm font-bold text-iuc-blue underline"
+                className="text-sm font-bold text-iuc-red underline"
                 onClick={loadOptions}
                 type="button"
               >
@@ -402,7 +402,7 @@ function Inscriptions() {
               <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
                 <input
                   checked={form.fraisPayes}
-                  className="h-4 w-4 accent-iuc-blue"
+                  className="h-4 w-4 accent-iuc-red"
                   onChange={(event) => updateForm('fraisPayes', event.target.checked)}
                   type="checkbox"
                 />
@@ -442,7 +442,7 @@ function Inscriptions() {
                   Annuler
                 </button>
                 <button
-                  className="rounded-xl bg-iuc-blue px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-blue/90 disabled:opacity-60"
+                  className="rounded-xl bg-iuc-red px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-red/90 disabled:opacity-60"
                   disabled={saving || students.length === 0 || levels.length === 0 || years.length === 0}
                   type="submit"
                 >

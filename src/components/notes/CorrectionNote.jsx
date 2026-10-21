@@ -155,7 +155,7 @@ function CorrectionNote({ ligne, bareme, onClose, onCorrigee, recharger }) {
           Annuler
         </button>
         <button
-          className="rounded-xl bg-iuc-blue px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:opacity-60"
+          className="rounded-xl bg-iuc-red px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:opacity-60"
           disabled={occupe}
           onClick={valider}
           type="button"

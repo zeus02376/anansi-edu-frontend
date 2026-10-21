@@ -16,9 +16,9 @@ function StepIndicator({ steps, current, locked, onGo }) {
               aria-hidden="true"
               className={`relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold transition ${
                 done
-                  ? 'bg-iuc-blue text-white'
+                  ? 'bg-iuc-red text-white'
                   : active
-                    ? 'bg-iuc-blue text-white ring-4 ring-iuc-blue/20'
+                    ? 'bg-iuc-red text-white ring-4 ring-iuc-red/20'
                     : 'border-2 border-slate-300 bg-white text-slate-400'
               }`}
             >
@@ -44,13 +44,13 @@ function StepIndicator({ steps, current, locked, onGo }) {
                 <span
                   aria-hidden="true"
                   className={`absolute left-[-50%] right-1/2 top-4 h-0.5 -translate-y-1/2 ${
-                    index <= current ? 'bg-iuc-blue' : 'bg-slate-200'
+                    index <= current ? 'bg-iuc-red' : 'bg-slate-200'
                   }`}
                 />
               )}
               {done && !locked ? (
                 <button
-                  className="group relative flex min-w-0 flex-col items-center gap-1.5 rounded-md px-1 focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-blue/20"
+                  className="group relative flex min-w-0 flex-col items-center gap-1.5 rounded-md px-1 focus:outline-none focus-visible:ring-4 focus-visible:ring-iuc-red/20"
                   onClick={() => onGo(index)}
                   type="button"
                 >

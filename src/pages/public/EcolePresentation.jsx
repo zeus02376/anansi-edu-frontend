@@ -70,7 +70,7 @@ function EcolePresentation() {
       <MessagePage title="Chargement impossible">
         <p role="alert">{error.message}</p>
         <button
-          className="mt-3 font-bold text-iuc-blue underline"
+          className="mt-3 font-bold text-iuc-red underline"
           onClick={() => setAttempt((count) => count + 1)}
           type="button"
         >
@@ -89,13 +89,13 @@ function EcolePresentation() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-8">
           <nav aria-label="Fil d’Ariane" className="text-sm text-slate-400">
-            <Link className="hover:text-iuc-blue" to="/filieres">
+            <Link className="hover:text-iuc-red" to="/filieres">
               Filières
             </Link>
             <span aria-hidden="true"> › </span>
             <span className="text-slate-600">{ecole.nom}</span>
           </nav>
-          <p className="mt-4 text-sm font-semibold text-iuc-blue">École</p>
+          <p className="mt-4 text-sm font-semibold text-iuc-red">École</p>
           <h1
             className={`mt-2 text-3xl font-bold leading-tight sm:text-4xl ${
               accent.text || 'text-slate-900'
@@ -127,7 +127,7 @@ function EcolePresentation() {
             </p>
           )}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-bold text-iuc-blue" id="presentation-titre">
+            <h2 className="text-lg font-bold text-iuc-red" id="presentation-titre">
               Présentation
             </h2>
             {presentation?.descriptionLongue ? (
@@ -139,7 +139,7 @@ function EcolePresentation() {
         </section>
 
         <section aria-labelledby="filieres-titre">
-          <h2 className="text-lg font-bold text-iuc-blue" id="filieres-titre">
+          <h2 className="text-lg font-bold text-iuc-red" id="filieres-titre">
             Les filières de l’école
           </h2>
           {filieres.statut === 'chargement' ? (

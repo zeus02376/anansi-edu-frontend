@@ -130,7 +130,7 @@ function Dossier() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Espace étudiant</p>
+        <p className="text-sm font-semibold text-iuc-red">Espace étudiant</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Mon dossier</h1>
         <p className="mt-2 text-sm text-slate-500">
           Votre profil, vos inscriptions et votre candidature d’origine.

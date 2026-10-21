@@ -10,6 +10,12 @@
 // page (« Présentation en cours de rédaction »), jamais par une erreur.
 export const presentationParCode = {
   SEAS: {
+    // Résumé pour l'accueil : deux phrases, sans reprendre le texte long
+    resume:
+      'L’école d’ingénierie et de sciences appliquées de l’IUC : des formations techniques, ' +
+      'scientifiques et de gestion, du HND au cycle ingénieur, enseignées en anglais. ' +
+      'Informatique, électricité et électronique, télécommunications, administration des affaires… ' +
+      'sous la tutelle du MINESUP et de la University of Buea.',
     descriptionLongue:
       'SEAS (School of Engineering and Applied Sciences) est l’école d’ingénierie et de sciences ' +
       'appliquées de l’Institut Universitaire de la Côte, à Douala. Elle propose des formations ' +

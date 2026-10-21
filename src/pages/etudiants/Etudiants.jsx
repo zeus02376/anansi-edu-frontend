@@ -74,14 +74,14 @@ function Etudiants() {
     <DashboardLayout>
       <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm font-semibold text-iuc-blue">Gestion académique</p>
+          <p className="text-sm font-semibold text-iuc-red">Gestion académique</p>
           <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Étudiants</h1>
           <p className="mt-2 text-sm text-slate-500">
             Consultez les profils et le parcours d’inscription des étudiants.
           </p>
         </div>
         <Link
-          className="inline-flex items-center justify-center rounded-xl bg-iuc-blue px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-blue/90"
+          className="inline-flex items-center justify-center rounded-xl bg-iuc-red px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-red/90"
           to="/scolarite/candidatures"
         >
           Traiter les candidatures
@@ -92,7 +92,7 @@ function Etudiants() {
         <label className="mb-4 block">
           <span className="sr-only">Rechercher un étudiant</span>
           <input
-            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-iuc-blue focus:ring-4 focus:ring-iuc-blue/10 sm:max-w-md"
+            className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-iuc-red focus:ring-4 focus:ring-iuc-red/10 sm:max-w-md"
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Nom, e-mail, matricule ou nationalité"
             type="search"
@@ -132,7 +132,7 @@ function Etudiants() {
                 <tbody className="divide-y divide-slate-100">
                   {filteredStudents.map((student) => (
                     <tr className="hover:bg-slate-50/70" key={student.id}>
-                      <td className="whitespace-nowrap px-4 py-4 font-mono text-sm font-semibold text-iuc-blue first:pl-5 sm:first:pl-6">
+                      <td className="whitespace-nowrap px-4 py-4 font-mono text-sm font-semibold text-iuc-red first:pl-5 sm:first:pl-6">
                         {student.matricule}
                       </td>
                       <td className="px-4 py-4 text-sm font-semibold text-slate-800">
@@ -149,7 +149,7 @@ function Etudiants() {
                       </td>
                       <td className="whitespace-nowrap px-4 py-4 text-right last:pr-5 sm:last:pr-6">
                         <button
-                          className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5"
+                          className="rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red transition hover:bg-iuc-red/5"
                           onClick={() => openDetails(student)}
                           type="button"
                         >
@@ -184,7 +184,7 @@ function Etudiants() {
                 {detailsError}
               </p>
               <button
-                className="text-sm font-bold text-iuc-blue underline"
+                className="text-sm font-bold text-iuc-red underline"
                 onClick={() => openDetails(selected)}
                 type="button"
               >

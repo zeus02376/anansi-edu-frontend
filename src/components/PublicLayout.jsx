@@ -12,7 +12,7 @@ const links = [
 const linkClass = ({ isActive }) =>
   `border-b-2 px-1 py-1.5 text-sm font-semibold transition ${
     isActive
-      ? 'border-iuc-gold text-white'
+      ? 'border-white text-white'
       : 'border-transparent text-white/75 hover:text-white'
   }`
 
@@ -27,7 +27,7 @@ function PublicLayout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-iuc-light">
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-iuc-blue text-white shadow-sm">
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-iuc-red text-white shadow-sm">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-8">
           <Link
             to="/"
@@ -48,7 +48,7 @@ function PublicLayout() {
           </nav>
           <Link
             to="/login"
-            className="rounded-xl bg-iuc-gold px-4 py-2 text-sm font-bold text-iuc-blue transition hover:bg-iuc-gold/85 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
+            className="rounded-xl bg-iuc-green px-4 py-2 text-sm font-bold text-white transition hover:bg-iuc-green/85 focus:outline-none focus-visible:ring-4 focus-visible:ring-white/30"
           >
             Connexion
           </Link>
@@ -59,7 +59,7 @@ function PublicLayout() {
         <Outlet />
       </main>
 
-      <footer className="bg-iuc-blue text-white/80">
+      <footer className="bg-iuc-red text-white/80">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div>
             <BrandMark subtitle="Institut Universitaire de la Côte" />
@@ -79,7 +79,7 @@ function PublicLayout() {
             </Link>
           </nav>
         </div>
-        <p className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/60">
+        <p className="border-t border-white/10 px-4 py-4 text-center text-xs text-white/75">
           © {new Date().getFullYear()} Institut Universitaire de la Côte. Tous droits réservés.
         </p>
       </footer>

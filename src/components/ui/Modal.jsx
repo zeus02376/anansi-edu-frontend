@@ -18,7 +18,7 @@ function Modal({ title, onClose, children, wide = false }) {
         role="dialog"
       >
         <div className="sticky top-0 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4 sm:px-6">
-          <h2 id="modal-title" className="text-lg font-bold text-iuc-blue">
+          <h2 id="modal-title" className="text-lg font-bold text-iuc-red">
             {title}
           </h2>
           <button

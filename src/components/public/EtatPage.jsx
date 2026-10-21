@@ -9,7 +9,7 @@ export function MessagePage({ title, children, retour = RETOUR_FILIERES }) {
     <div className="mx-auto max-w-2xl px-4 py-20 text-center sm:px-8">
       <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
       <div className="mt-3 text-sm text-slate-500">{children}</div>
-      <Link className="mt-6 inline-block text-sm font-bold text-iuc-blue underline" to={retour.to}>
+      <Link className="mt-6 inline-block text-sm font-bold text-iuc-red underline" to={retour.to}>
         {retour.label}
       </Link>
     </div>

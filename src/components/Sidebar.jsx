@@ -50,24 +50,24 @@ function Sidebar({ open, onClose }) {
         />
       )}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/10 bg-iuc-blue text-white transition-transform duration-200 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-white/10 bg-iuc-red text-white transition-transform duration-200 lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex h-20 items-center gap-3 border-b border-white/10 px-7">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-lg font-black text-iuc-blue">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-lg font-black text-iuc-red">
             I
           </div>
           <div>
             <p className="text-lg font-extrabold tracking-wide text-white">IUC Campus</p>
-            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/60">
+            <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-white/75">
               Espace académique
             </p>
           </div>
         </div>
 
         <div className="px-5 pb-3 pt-7">
-          <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/60">
+          <p className="px-3 text-[11px] font-bold uppercase tracking-[0.16em] text-white/75">
             Espace {user?.role?.toLowerCase() ?? ''}
           </p>
         </div>
@@ -81,7 +81,7 @@ function Sidebar({ open, onClose }) {
               className={({ isActive }) =>
                 `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${
                   isActive
-                    ? 'bg-iuc-gold text-iuc-blue'
+                    ? 'bg-iuc-green text-white'
                     : 'text-white/80 hover:bg-white/10 hover:text-white'
                 }`
               }

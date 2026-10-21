@@ -449,7 +449,7 @@ function Candidatures() {
     <DashboardLayout>
       <div className="mb-7 flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
         <div>
-          <p className="text-sm font-semibold text-iuc-blue">Admissions</p>
+          <p className="text-sm font-semibold text-iuc-red">Admissions</p>
           <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
             Candidatures
           </h1>
@@ -458,11 +458,11 @@ function Candidatures() {
           </p>
         </div>
         <button
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-iuc-blue px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-iuc-blue/90 focus:outline-none focus:ring-4 focus:ring-iuc-blue/20"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-iuc-red px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-iuc-red/90 focus:outline-none focus:ring-4 focus:ring-iuc-red/20"
           onClick={openNewCandidature}
           type="button"
         >
-          <span aria-hidden="true" className="text-lg leading-none text-iuc-gold">
+          <span aria-hidden="true" className="text-lg leading-none text-white">
             +
           </span>
           Nouvelle candidature
@@ -485,7 +485,7 @@ function Candidatures() {
                   Identifiant : <span className="font-semibold">{createdAccount.email}</span>
                   <br />
                   Mot de passe temporaire :{' '}
-                  <code className="select-all rounded-md bg-white px-2 py-0.5 font-mono text-base font-bold tracking-wider text-iuc-blue ring-1 ring-emerald-200">
+                  <code className="select-all rounded-md bg-white px-2 py-0.5 font-mono text-base font-bold tracking-wider text-iuc-red ring-1 ring-emerald-200">
                     {createdAccount.motDePasseTemporaire}
                   </code>
                 </p>
@@ -577,7 +577,7 @@ function Candidatures() {
             className="flex min-h-64 flex-col items-center justify-center gap-3 p-8"
             role="status"
           >
-            <span className="h-9 w-9 animate-spin rounded-full border-4 border-iuc-blue/15 border-t-iuc-blue" />
+            <span className="h-9 w-9 animate-spin rounded-full border-4 border-iuc-red/15 border-t-iuc-red" />
             <span className="text-sm text-slate-500">Chargement des candidatures…</span>
           </div>
         ) : filteredCandidatures.length === 0 ? (
@@ -620,7 +620,7 @@ function Candidatures() {
                   const rowMessage = rowMessages[candidature.id]
                   return (
                     <tr key={candidature.id} className="align-top transition hover:bg-slate-50/70">
-                      <td className="whitespace-nowrap px-4 py-4 text-sm font-semibold text-iuc-blue">
+                      <td className="whitespace-nowrap px-4 py-4 text-sm font-semibold text-iuc-red">
                         {candidature.numeroDossier || '—'}
                       </td>
                       <td className="px-4 py-4 text-sm font-semibold text-slate-800">
@@ -639,14 +639,14 @@ function Candidatures() {
                       <td className="px-4 py-4">
                         <div className="flex flex-wrap items-center gap-2">
                           <button
-                            className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-iuc-blue hover:text-iuc-blue"
+                            className="rounded-lg border border-slate-200 px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-iuc-red hover:text-iuc-red"
                             onClick={() => openDetails(candidature)}
                             type="button"
                           >
                             Voir
                           </button>
                           <button
-                            className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5"
+                            className="rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red transition hover:bg-iuc-red/5"
                             onClick={() => openStatus(candidature)}
                             type="button"
                           >
@@ -656,7 +656,7 @@ function Candidatures() {
                             !studentExists &&
                             !studentError && (
                             <button
-                              className="rounded-lg bg-iuc-gold px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-gold/85 disabled:cursor-not-allowed disabled:opacity-60"
+                              className="rounded-lg bg-iuc-green px-3 py-2 text-xs font-bold text-white transition hover:bg-iuc-green/85 disabled:cursor-not-allowed disabled:opacity-60"
                               disabled={
                                 studentsLoading || rowLoading[candidature.id]
                               }
@@ -709,7 +709,7 @@ function Candidatures() {
         <Modal onClose={closeModal} title="Détails de la candidature" wide>
           {modalLoading ? (
             <div className="flex items-center justify-center gap-3 py-10" role="status">
-              <span className="h-7 w-7 animate-spin rounded-full border-4 border-iuc-blue/15 border-t-iuc-blue" />
+              <span className="h-7 w-7 animate-spin rounded-full border-4 border-iuc-red/15 border-t-iuc-red" />
               <span className="text-sm text-slate-500">Chargement des détails…</span>
             </div>
           ) : (
@@ -755,7 +755,7 @@ function Candidatures() {
                           {document.valide ? ' · Validé' : ' · À vérifier'}
                         </span>
                         <button
-                          className="shrink-0 rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="shrink-0 rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red transition hover:bg-iuc-red/5 disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={documentLoading[document.id]}
                           onClick={() => openDocument(document)}
                           type="button"
@@ -801,7 +801,7 @@ function Candidatures() {
                           </div>
                           {status === 'ECHEC' && notification.peutRelancer && (
                             <button
-                              className="rounded-lg border border-iuc-blue/20 px-3 py-2 text-xs font-bold text-iuc-blue transition hover:bg-iuc-blue/5 disabled:cursor-not-allowed disabled:opacity-60"
+                              className="rounded-lg border border-iuc-red/20 px-3 py-2 text-xs font-bold text-iuc-red transition hover:bg-iuc-red/5 disabled:cursor-not-allowed disabled:opacity-60"
                               disabled={notificationLoading[notification.id]}
                               onClick={() => retryNotification(notification)}
                               type="button"
@@ -893,7 +893,7 @@ function Candidatures() {
                 Annuler
               </button>
               <button
-                className="rounded-xl bg-iuc-blue px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-blue/90 disabled:opacity-60"
+                className="rounded-xl bg-iuc-red px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-red/90 disabled:opacity-60"
                 disabled={modalLoading}
                 type="submit"
               >
@@ -908,7 +908,7 @@ function Candidatures() {
         <Modal onClose={closeModal} title="Nouvelle candidature" wide>
           {optionsLoading ? (
             <div className="flex items-center justify-center gap-3 py-10" role="status">
-              <span className="h-7 w-7 animate-spin rounded-full border-4 border-iuc-blue/15 border-t-iuc-blue" />
+              <span className="h-7 w-7 animate-spin rounded-full border-4 border-iuc-red/15 border-t-iuc-red" />
               <span className="text-sm text-slate-500">Chargement des filières et années…</span>
             </div>
           ) : (
@@ -1037,7 +1037,7 @@ function Candidatures() {
                   Annuler
                 </button>
                 <button
-                  className="rounded-xl bg-iuc-blue px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-blue/90 disabled:opacity-60"
+                  className="rounded-xl bg-iuc-red px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-red/90 disabled:opacity-60"
                   disabled={
                     modalLoading ||
                     options.filieres.length === 0 ||
@@ -1065,7 +1065,7 @@ function Candidatures() {
           </div>
           <div className="mt-5 flex justify-end">
             <button
-              className="rounded-xl bg-iuc-blue px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-blue/90"
+              className="rounded-xl bg-iuc-red px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-red/90"
               onClick={closeModal}
               type="button"
             >

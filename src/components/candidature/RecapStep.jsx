@@ -6,8 +6,8 @@ function Bloc({ titre, onEdit, children }) {
   return (
     <section className="rounded-xl border border-slate-200 p-4">
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-bold text-iuc-blue">{titre}</h3>
-        <button className="text-sm font-semibold text-slate-500 underline hover:text-iuc-blue" onClick={onEdit} type="button">
+        <h3 className="font-bold text-iuc-red">{titre}</h3>
+        <button className="text-sm font-semibold text-slate-500 underline hover:text-iuc-red" onClick={onEdit} type="button">
           Modifier
         </button>
       </div>
@@ -63,7 +63,7 @@ function RecapStep({ values, filiere, annee, onEdit, register, errors }) {
       <div>
         <label className="flex items-start gap-3 text-sm text-slate-700">
           <input
-            className="mt-0.5 h-4 w-4 accent-iuc-blue"
+            className="mt-0.5 h-4 w-4 accent-iuc-red"
             type="checkbox"
             {...register('certifie', { required: 'Vous devez certifier l’exactitude de ces informations.' })}
           />
