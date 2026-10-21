@@ -32,7 +32,7 @@ function ModulePlaceholder({ title }) {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Gestion académique</p>
+        <p className="text-sm font-semibold text-iuc-red">Gestion académique</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{title}</h1>
       </div>
       <section className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">

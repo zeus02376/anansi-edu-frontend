@@ -85,7 +85,7 @@ function NotesEvaluation() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <Link className="text-sm font-semibold text-iuc-blue hover:underline" to="/scolarite/notes">
+        <Link className="text-sm font-semibold text-iuc-red hover:underline" to="/scolarite/notes">
           ← Évaluations
         </Link>
       </div>
@@ -116,7 +116,7 @@ function NotesEvaluation() {
         <>
           <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-sm font-semibold text-iuc-blue">
+              <p className="text-sm font-semibold text-iuc-red">
                 {evaluation.matiere?.nom} ({evaluation.matiere?.code})
               </p>
               <h1 className="mt-1 flex flex-wrap items-center gap-3 text-2xl font-bold text-slate-900 sm:text-3xl">
@@ -208,7 +208,7 @@ function NotesEvaluation() {
                             <>
                               <button
                                 aria-label={`Corriger la note de ${nom}`}
-                                className="rounded-lg border border-iuc-blue/20 px-3 py-1.5 text-xs font-bold text-iuc-blue hover:bg-iuc-blue/5"
+                                className="rounded-lg border border-iuc-red/20 px-3 py-1.5 text-xs font-bold text-iuc-red hover:bg-iuc-red/5"
                                 onClick={() => setCorrection(ligne)}
                                 type="button"
                               >

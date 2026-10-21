@@ -134,7 +134,7 @@ function DocumentsUploader({ candidatureId, numeroDossier, email, piecesRequises
 
               {ligne.statut === 'envoye' ? (
                 <button
-                  className="mt-2 text-xs font-semibold text-slate-500 underline hover:text-iuc-blue"
+                  className="mt-2 text-xs font-semibold text-slate-500 underline hover:text-iuc-red"
                   onClick={() => nouveau(type)}
                   type="button"
                 >
@@ -144,7 +144,7 @@ function DocumentsUploader({ candidatureId, numeroDossier, email, piecesRequises
                 <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <input
                     accept={DOCUMENT_ACCEPT}
-                    className="min-w-0 flex-1 text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-iuc-blue/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-iuc-blue hover:file:bg-iuc-blue/15"
+                    className="min-w-0 flex-1 text-sm text-slate-600 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-iuc-red/10 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-iuc-red hover:file:bg-iuc-red/15"
                     disabled={ligne.statut === 'envoi' || enCours}
                     id={`doc-${type}`}
                     key={ligne.cle}
@@ -152,7 +152,7 @@ function DocumentsUploader({ candidatureId, numeroDossier, email, piecesRequises
                     type="file"
                   />
                   <button
-                    className="shrink-0 rounded-lg bg-iuc-blue px-4 py-2 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="shrink-0 rounded-lg bg-iuc-red px-4 py-2 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:cursor-not-allowed disabled:opacity-40"
                     disabled={!envoyable(ligne) || enCours || limiteAtteinte}
                     onClick={() => envoyerUn(type)}
                     type="button"
@@ -177,7 +177,7 @@ function DocumentsUploader({ candidatureId, numeroDossier, email, piecesRequises
                   role="progressbar"
                 >
                   <div
-                    className="h-full rounded-full bg-iuc-blue transition-all"
+                    className="h-full rounded-full bg-iuc-red transition-all"
                     style={{ width: `${ligne.progression}%` }}
                   />
                 </div>
@@ -197,7 +197,7 @@ function DocumentsUploader({ candidatureId, numeroDossier, email, piecesRequises
           {envoyes > 0 ? `${envoyes} document${envoyes > 1 ? 's' : ''} envoyé${envoyes > 1 ? 's' : ''}` : 'Aucun document envoyé pour l’instant'}
         </p>
         <button
-          className="rounded-xl bg-iuc-blue px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-xl bg-iuc-red px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:cursor-not-allowed disabled:opacity-40"
           disabled={prets < 2 || enCours || limiteAtteinte}
           onClick={toutEnvoyer}
           type="button"

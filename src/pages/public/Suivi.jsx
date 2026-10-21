@@ -63,7 +63,7 @@ function DepotDocuments({ suivi }) {
 
   return (
     <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-      <h2 className="text-lg font-bold text-iuc-blue">Envoyer des documents</h2>
+      <h2 className="text-lg font-bold text-iuc-red">Envoyer des documents</h2>
       {!valide ? (
         <form className="mt-3" noValidate onSubmit={confirmer}>
           <p className="text-sm text-slate-500">
@@ -87,7 +87,7 @@ function DepotDocuments({ suivi }) {
               {erreur && <p className="mt-1 text-xs text-red-600">{erreur}</p>}
             </div>
             <button
-              className="rounded-xl bg-iuc-blue px-5 py-2.5 text-sm font-bold text-white hover:bg-iuc-blue/90"
+              className="rounded-xl bg-iuc-red px-5 py-2.5 text-sm font-bold text-white hover:bg-iuc-red/90"
               type="submit"
             >
               Continuer
@@ -100,7 +100,7 @@ function DepotDocuments({ suivi }) {
             Les documents que vous envoyez ici sont transmis à la scolarité ; la liste des documents déjà reçus
             n’est pas affichée sur cette page.{' '}
             <button
-              className="font-semibold text-iuc-blue underline"
+              className="font-semibold text-iuc-red underline"
               onClick={() => setValide(false)}
               type="button"
             >
@@ -165,7 +165,7 @@ function Suivi() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-8">
-      <p className="text-sm font-semibold text-iuc-blue">Suivi</p>
+      <p className="text-sm font-semibold text-iuc-red">Suivi</p>
       <h1 className="mt-2 text-3xl font-bold text-slate-900">Suivre ma candidature</h1>
       <p className="mt-3 text-sm leading-6 text-slate-500">
         Saisissez le numéro de dossier remis lors du dépôt de votre candidature.
@@ -194,7 +194,7 @@ function Suivi() {
           </Field>
         </div>
         <button
-          className="rounded-xl bg-iuc-blue px-6 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-[1.85rem]"
+          className="rounded-xl bg-iuc-red px-6 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-[1.85rem]"
           disabled={enCours}
           type="submit"
         >
@@ -215,7 +215,7 @@ function Suivi() {
             className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-lg font-bold text-iuc-blue">Dossier {suivi.numeroDossier}</h2>
+              <h2 className="text-lg font-bold text-iuc-red">Dossier {suivi.numeroDossier}</h2>
               <StatusBadge statut={suivi.statut} />
             </div>
             <p className="mt-3 text-sm text-slate-600">{statusMessages[suivi.statut]}</p>

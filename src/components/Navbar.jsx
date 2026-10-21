@@ -14,7 +14,7 @@ function Navbar({ onMenuClick }) {
   }
 
   return (
-    <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-white/10 bg-iuc-blue px-4 text-white backdrop-blur sm:px-8">
+    <header className="sticky top-0 z-20 flex h-20 items-center justify-between border-b border-white/10 bg-iuc-red px-4 text-white backdrop-blur sm:px-8">
       <button
         aria-label="Ouvrir le menu"
         className="rounded-lg p-2 text-white hover:bg-white/10 lg:hidden"
@@ -32,7 +32,7 @@ function Navbar({ onMenuClick }) {
           </p>
           <p className="text-xs text-white/70">{user?.role}</p>
         </div>
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-iuc-gold text-sm font-bold text-iuc-blue">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-iuc-green text-sm font-bold text-white">
           {initials || 'A'}
         </div>
         <button

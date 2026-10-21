@@ -57,7 +57,7 @@ function FormationStep({ catalogue, filiereId, onSelect, anneeId, onSelectAnnee,
       <div>
         <p className="text-sm text-slate-500">
           Filtrez par campus ou par école, ou cherchez un nom de formation. Vous pouvez aussi{' '}
-          <Link className="font-semibold text-iuc-blue underline" rel="noreferrer" target="_blank" to="/filieres">
+          <Link className="font-semibold text-iuc-red underline" rel="noreferrer" target="_blank" to="/filieres">
             parcourir le catalogue détaillé
           </Link>
           .
@@ -108,12 +108,12 @@ function FormationStep({ catalogue, filiereId, onSelect, anneeId, onSelectAnnee,
           <div className="mt-3 space-y-2" role="radiogroup">
             {visibles.map((f) => (
               <label
-                className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-iuc-blue/40 has-[:checked]:border-iuc-blue has-[:checked]:bg-iuc-blue/5 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-iuc-blue/20"
+                className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-iuc-red/40 has-[:checked]:border-iuc-red has-[:checked]:bg-iuc-red/5 has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-iuc-red/20"
                 key={f.id}
               >
                 <input
                   checked={f.id === filiereId}
-                  className="mt-1 h-4 w-4 accent-iuc-blue"
+                  className="mt-1 h-4 w-4 accent-iuc-red"
                   name="filiere"
                   onChange={() => onSelect(f)}
                   type="radio"
@@ -125,7 +125,7 @@ function FormationStep({ catalogue, filiereId, onSelect, anneeId, onSelectAnnee,
                     {f.ecole.campus ? ` · Campus ${f.ecole.campus.nom}` : ''}
                   </span>
                   <span className="mt-2 flex flex-wrap gap-2 text-xs font-semibold">
-                    <span className="rounded-full bg-iuc-blue/10 px-2 py-0.5 text-iuc-blue">
+                    <span className="rounded-full bg-iuc-red/10 px-2 py-0.5 text-iuc-red">
                       {cycleLabels[f.cycle] ?? f.cycle}
                     </span>
                     {f.langue && (

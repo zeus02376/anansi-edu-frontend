@@ -18,7 +18,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Espace étudiant</p>
+        <p className="text-sm font-semibold text-iuc-red">Espace étudiant</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           {profil.data ? `Bonjour ${nomComplet(profil.data.user)}` : 'Tableau de bord Étudiant'}
         </h1>
@@ -75,7 +75,7 @@ function Dashboard() {
                 {anneeNotes.moyenneGenerale === null ? (
                   <p className="text-sm text-slate-500">Pas encore de moyenne : aucune note publiée.</p>
                 ) : (
-                  <p className="text-3xl font-black text-iuc-blue" data-testid="dashboard-moyenne">
+                  <p className="text-3xl font-black text-iuc-red" data-testid="dashboard-moyenne">
                     {formatNombre(anneeNotes.moyenneGenerale)}
                     <span className="text-base font-semibold text-slate-400"> / 20</span>
                   </p>
@@ -94,10 +94,10 @@ function Dashboard() {
         </Carte>
       </div>
       <p className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-        <Link className="font-semibold text-iuc-blue underline" to="/etudiant/notes">
+        <Link className="font-semibold text-iuc-red underline" to="/etudiant/notes">
           Voir mes notes →
         </Link>
-        <Link className="font-semibold text-iuc-blue underline" to="/etudiant/dossier">
+        <Link className="font-semibold text-iuc-red underline" to="/etudiant/dossier">
           Voir tout mon dossier →
         </Link>
       </p>

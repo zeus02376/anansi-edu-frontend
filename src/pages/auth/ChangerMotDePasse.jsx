@@ -12,7 +12,7 @@ function getErrorMessage(error, fallback) {
 }
 
 const inputClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-iuc-blue focus:ring-4 focus:ring-iuc-blue/10'
+  'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 outline-none transition focus:border-iuc-red focus:ring-4 focus:ring-iuc-red/10'
 
 function ChangerMotDePasse() {
   const navigate = useNavigate()
@@ -52,7 +52,7 @@ function ChangerMotDePasse() {
   return (
     <DashboardLayout>
       <div className="mb-7">
-        <p className="text-sm font-semibold text-iuc-blue">Mon compte</p>
+        <p className="text-sm font-semibold text-iuc-red">Mon compte</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           Changer mon mot de passe
         </h1>
@@ -136,7 +136,7 @@ function ChangerMotDePasse() {
             </p>
           )}
           <button
-            className="w-full rounded-xl bg-iuc-blue px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-blue/90 disabled:opacity-60"
+            className="w-full rounded-xl bg-iuc-red px-4 py-2.5 text-sm font-bold text-white hover:bg-iuc-red/90 disabled:opacity-60"
             disabled={submitting}
             type="submit"
           >

@@ -24,7 +24,7 @@ function Matieres() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Espace enseignant</p>
+        <p className="text-sm font-semibold text-iuc-red">Espace enseignant</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Mes matières</h1>
         <p className="mt-2 text-sm text-slate-500">
           Les matières qui vous sont affectées, par année académique.
@@ -53,7 +53,7 @@ function Matieres() {
                     </p>
                   </div>
                   <div className="text-right text-sm">
-                    <p className="font-semibold text-iuc-blue">
+                    <p className="font-semibold text-iuc-red">
                       Année {affectation.anneeAcademique?.libelle}
                     </p>
                     {affectation.heuresPrevues > 0 && (
@@ -63,7 +63,7 @@ function Matieres() {
                   </div>
                   <button
                     aria-expanded={ouverte === affectation.matiere?.id}
-                    className="mt-3 text-sm font-semibold text-iuc-blue underline"
+                    className="mt-3 text-sm font-semibold text-iuc-red underline"
                     onClick={() =>
                       setOuverte((courante) => (courante === affectation.matiere?.id ? null : affectation.matiere?.id))
                     }

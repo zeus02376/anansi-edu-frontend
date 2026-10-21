@@ -13,7 +13,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Espace enseignant</p>
+        <p className="text-sm font-semibold text-iuc-red">Espace enseignant</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           {data ? `Bonjour ${nomComplet(data.user)}` : 'Tableau de bord Enseignant'}
         </h1>
@@ -36,7 +36,7 @@ function Dashboard() {
               <Champ label="Spécialité">{data.specialite}</Champ>
               {data.cvUrl && (
                 <Champ label="CV">
-                  <a className="text-iuc-blue underline" href={data.cvUrl} rel="noreferrer" target="_blank">
+                  <a className="text-iuc-red underline" href={data.cvUrl} rel="noreferrer" target="_blank">
                     Consulter
                   </a>
                 </Champ>
@@ -46,7 +46,7 @@ function Dashboard() {
         </Etat>
       </Carte>
       <p className="mt-6 text-sm">
-        <Link className="font-semibold text-iuc-blue underline" to="/enseignant/matieres">
+        <Link className="font-semibold text-iuc-red underline" to="/enseignant/matieres">
           Voir mes matières →
         </Link>
       </p>

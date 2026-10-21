@@ -34,7 +34,7 @@ function Confirmation({ dossier, notification, onNouvelle, titleRef }) {
         )}
         <p className="mt-3 text-sm text-emerald-900">Votre numéro de dossier :</p>
         <div className="mt-2 flex flex-wrap items-center gap-3">
-          <code className="select-all rounded-lg bg-white px-4 py-2 font-mono text-xl font-bold tracking-wider text-iuc-blue ring-1 ring-emerald-200">
+          <code className="select-all rounded-lg bg-white px-4 py-2 font-mono text-xl font-bold tracking-wider text-iuc-red ring-1 ring-emerald-200">
             {dossier.numeroDossier}
           </code>
           <button
@@ -50,7 +50,7 @@ function Confirmation({ dossier, notification, onNouvelle, titleRef }) {
           pour envoyer vos documents. Il ne pourra pas vous être redonné automatiquement.
         </p>
         <Link
-          className="mt-4 inline-block text-sm font-bold text-iuc-blue underline"
+          className="mt-4 inline-block text-sm font-bold text-iuc-red underline"
           to={`/suivi?numero=${encodeURIComponent(dossier.numeroDossier)}`}
         >
           Suivre ma candidature →
@@ -58,11 +58,11 @@ function Confirmation({ dossier, notification, onNouvelle, titleRef }) {
       </section>
 
       <section>
-        <h2 className="text-lg font-bold text-iuc-blue">Envoyer mes documents</h2>
+        <h2 className="text-lg font-bold text-iuc-red">Envoyer mes documents</h2>
         <p className="mt-2 text-sm text-slate-500">
           Vous pouvez envoyer vos pièces maintenant ou plus tard : ce n’est pas obligatoire pour
           finaliser le dépôt. Pour le faire plus tard, utilisez la page{' '}
-          <Link className="font-semibold text-iuc-blue underline" to="/suivi">
+          <Link className="font-semibold text-iuc-red underline" to="/suivi">
             Suivi
           </Link>{' '}
           avec votre numéro de dossier et l’e-mail de votre candidature ({dossier.email}).
@@ -79,13 +79,13 @@ function Confirmation({ dossier, notification, onNouvelle, titleRef }) {
 
       <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-between">
         <Link
-          className="inline-flex justify-center rounded-xl bg-iuc-blue px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-blue/90"
+          className="inline-flex justify-center rounded-xl bg-iuc-red px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-red/90"
           to="/"
         >
           Terminer
         </Link>
         <button
-          className="text-sm font-semibold text-slate-500 underline hover:text-iuc-blue"
+          className="text-sm font-semibold text-slate-500 underline hover:text-iuc-red"
           onClick={onNouvelle}
           type="button"
         >

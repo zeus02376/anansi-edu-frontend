@@ -3,9 +3,9 @@ import DashboardLayout from '../../components/DashboardLayout'
 import api from '../../services/api'
 
 const statCards = [
-  { key: 'tenants', label: 'Établissements', description: 'Universités sur IUC Campus', tone: 'bg-iuc-gold/15 text-iuc-blue' },
-  { key: 'ecoles', label: 'Écoles', description: 'Structures académiques', tone: 'bg-iuc-blue/10 text-iuc-blue' },
-  { key: 'etudiants', label: 'Étudiants', description: 'Dossiers enregistrés', tone: 'bg-iuc-gold/15 text-iuc-blue' },
+  { key: 'tenants', label: 'Établissements', description: 'Universités sur IUC Campus', tone: 'bg-iuc-green/15 text-iuc-red' },
+  { key: 'ecoles', label: 'Écoles', description: 'Structures académiques', tone: 'bg-iuc-red/10 text-iuc-red' },
+  { key: 'etudiants', label: 'Étudiants', description: 'Dossiers enregistrés', tone: 'bg-iuc-green/15 text-iuc-red' },
 ]
 
 function Dashboard() {
@@ -45,7 +45,7 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <div className="mb-8">
-        <p className="text-sm font-semibold text-iuc-blue">Vue d’ensemble</p>
+        <p className="text-sm font-semibold text-iuc-red">Vue d’ensemble</p>
         <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">
           Tableau de bord Admin
         </h1>

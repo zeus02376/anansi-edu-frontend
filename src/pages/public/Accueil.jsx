@@ -24,11 +24,11 @@ function Accueil() {
 
   return (
     <>
-      <section className="relative overflow-hidden bg-iuc-blue text-white">
+      <section className="relative overflow-hidden bg-iuc-red text-white">
         <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full border border-white/10" />
         <div className="absolute -bottom-36 -left-24 h-96 w-96 rounded-full border border-white/10" />
         <div className="relative mx-auto max-w-6xl px-4 py-20 sm:px-8 sm:py-28">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-iuc-gold">
+          <p className="text-sm font-bold uppercase tracking-[0.2em] text-white">
             Institut Universitaire de la Côte
           </p>
           <h1 className="mt-5 max-w-2xl text-4xl font-bold leading-tight sm:text-5xl">
@@ -40,7 +40,7 @@ function Accueil() {
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
-              className="inline-flex justify-center rounded-xl bg-iuc-gold px-5 py-3 text-sm font-bold text-iuc-blue transition hover:bg-iuc-gold/85"
+              className="inline-flex justify-center rounded-xl bg-iuc-green px-5 py-3 text-sm font-bold text-white transition hover:bg-iuc-green/85"
               to="/filieres"
             >
               Découvrir les filières
@@ -54,7 +54,7 @@ function Accueil() {
           </div>
           <p className="mt-5 text-sm text-white/70">
             Déjà candidat ?{' '}
-            <Link className="font-semibold text-white underline hover:text-iuc-gold" to="/suivi">
+            <Link className="font-semibold text-white underline hover:text-white/80" to="/suivi">
               Suivre ma candidature
             </Link>
           </p>
@@ -71,13 +71,13 @@ function Accueil() {
             >
               <span
                 aria-hidden="true"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-iuc-gold text-sm font-black text-iuc-blue"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-iuc-green text-sm font-black text-white"
               >
                 {index + 1}
               </span>
               <h3 className="mt-4 font-bold text-slate-900">{etape.titre}</h3>
               <p className="mt-2 text-sm leading-6 text-slate-500">{etape.texte}</p>
-              <Link className="mt-4 inline-block text-sm font-bold text-iuc-blue hover:underline" to={etape.lien.to}>
+              <Link className="mt-4 inline-block text-sm font-bold text-iuc-red hover:underline" to={etape.lien.to}>
                 {etape.lien.label} →
               </Link>
             </li>

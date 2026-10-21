@@ -234,7 +234,7 @@ function Evaluation() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <Link className="text-sm font-semibold text-iuc-blue hover:underline" to="/enseignant/matieres">
+        <Link className="text-sm font-semibold text-iuc-red hover:underline" to="/enseignant/matieres">
           ← Mes matières
         </Link>
       </div>
@@ -264,7 +264,7 @@ function Evaluation() {
       {evaluation && (
         <>
           <div className="mb-6">
-            <p className="text-sm font-semibold text-iuc-blue">{matiere ? matiere.nom : 'Évaluation'}</p>
+            <p className="text-sm font-semibold text-iuc-red">{matiere ? matiere.nom : 'Évaluation'}</p>
             <h1 className="mt-1 flex flex-wrap items-center gap-3 text-2xl font-bold text-slate-900 sm:text-3xl">
               {evaluation.nom}
               <span
@@ -399,7 +399,7 @@ function Evaluation() {
           {!verrouillee && grille.notes.length > 0 && (
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
-                className="rounded-xl bg-iuc-blue px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-blue/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-iuc-red px-5 py-2.5 text-sm font-bold text-white transition hover:bg-iuc-red/90 disabled:cursor-not-allowed disabled:opacity-50"
                 disabled={envoi || nbModifiees === 0}
                 onClick={enregistrer}
                 type="button"
